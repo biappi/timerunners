@@ -78,7 +78,7 @@ class fixed(value):
 def evaluate(struct_desc, buf, pos=0):
     context = {}
     context['__SUBSTS__'] = {}
-    return struct(loc(), struct_desc, buf, pos, context)
+    return struct(loc(), buf, pos, struct_desc=struct_desc, context=context)
 
 class counter_buffer(object):
     def __init__(self, b):
@@ -119,7 +119,7 @@ def dump_file(desc, path):
     buf.summary()
 
 
-def struct(loc, struct_desc, buf, pos=0, context={}):
+def struct(loc, buf, pos=0, struct_desc=None, context={}):
     output = []
     all_size = 0
     result = {}
@@ -146,6 +146,8 @@ def struct(loc, struct_desc, buf, pos=0, context={}):
 
 def padding(loc, buf, pos, size, context=None, **kwargs):
     size = size.get_in(context, loc)
+    for i in xrange(size):
+        buf[pos + i] # mark read
     return 0, size, ('%s Padding (0x%x - %d bytes)' % (loc_f(loc, pos), size, size))
 
 def uint8(loc, buf, pos, **kwargs):
@@ -164,15 +166,18 @@ def uint32(loc, buf, pos, **kwargs):
     v += buf[pos + 3] <<  24
     return v, 4, int_f(loc, pos, v)
 
-def array(loc, buf, pos, items=None, items_struct=None, context={}):
+def array(loc, buf, pos, items=None, items_struct=None, context={}, items_including=None):
     size = 0
     result = []
     out = []
 
-    items = items.get_in(context, loc)
+    if items:
+        items = items.get_in(context, loc)
+    elif items_including:
+        items = items_including.get_in(context, loc) + 1
 
     for i in xrange(items):
-        v, s, o = struct(loc.append(str(i)), items_struct, buf, pos + size, context=context)
+        v, s, o = struct(loc.append(str(i)), buf, pos + size, struct_desc=items_struct, context=context)
         result.append(v)
         out.append(o)
         size += s
@@ -192,7 +197,7 @@ def block(loc, buf, pos, offset=None, items_struct=None, count=None, ignore_if_z
             continue
 
         pos = offset.get_in(context, loc) 
-        v, s, o = struct(loc.append(i), items_struct, buf, pos, context=context)
+        v, s, o = struct(loc.append(i), buf, pos, struct_desc=items_struct, context=context)
         result.append(v)
         out.append(o)
 
