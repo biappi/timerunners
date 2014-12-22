@@ -23,89 +23,129 @@ def hexdump(data):
 
     print
 
+def loc_f(name, pos, name_prefix=None):
+    if name_prefix is not None:
+        name = name_prefix + '.' + name
+    return "%08x (%-30s) ]" % (pos, name)
+
 def int_f(name, pos, v):
-    return "%20s (%8x) ] %x (%d)" % (name, pos, v, v)
+    return "%s %x (%d)" % (loc_f(name, pos), v, v)
 
 ########################
 
-def evaluate(struct_desc, buf, pos=0, indent=0):
-    context = {}
-    return struct(None, struct_desc, buf, pos, indent, context)
+class loc(object):
+    def __init__(self, name='', prefix=None):
+        self.name = name
+        self.prefix = prefix
 
-def struct(name, struct_desc, buf, pos=0, indent=0, context={}):
+    def __str__(self):
+        if self.prefix is None:
+            return self.name
+        else:
+            return '%s.%s' % (self.prefix, self.name)
+
+    def append(self, name):
+        return loc(name, str(self))
+
+    def resolve(self, name):
+        if name.startswith('.'):
+            return # split string and recombine
+        else:
+            return loc(name, self.prefix)
+
+class value(object):
+    def get_in(self, context, loc):
+        raise # return None - to subclass
+
+class relative(value):
+    def __init__(self, loc):
+        self.loc = loc
+
+    def get_in(self, context, base_loc):
+        return context[str(base_loc.resolve(self.loc))]
+
+class fixed(value):
+    def __init__(self, v):
+        self.v = v
+
+    def get_in(self, context, loc):
+        return self.v
+    
+def evaluate(struct_desc, buf, pos=0):
+    context = {}
+    return struct(loc(), struct_desc, buf, pos, context)
+
+def struct(loc, struct_desc, buf, pos=0, context={}):
     output = []
     all_size = 0
+    result = {}
+
     for field_desc in struct_desc:
-        type_func, name = field_desc[:2]
+        type_func, field_name = field_desc[:2]
 
         try:    kwargs = field_desc[2]
         except: kwargs = {}
 
-        v, size, desc = type_func(name, buf, pos, indent=indent, struct=context, **kwargs)
+        field_loc = loc.append(field_name)
 
-        context[name] = v
+        v, size, desc = type_func(field_loc, buf, pos, context=context, **kwargs)
+        result[field_name] = v
 
-        output.append(('    ' * indent) + desc)
-        #print ('    ' * indent) + desc
+        context[str(field_loc)] = v
+
+        output.append(desc)
+
         pos += size
         all_size += size
 
-    return context, all_size, '\n'.join(output)
+    return result, all_size, '\n'.join(output)
 
 
-def padding(name, buf, pos, size, **kwargs):
-    return 0, size, ''
+def padding(loc, buf, pos, size, context=None, **kwargs):
+    size = size.get_in(context, loc)
+    return 0, size, ('%s Padding (0x%x - %d bytes)' % (loc_f(loc, pos), size, size))
 
-def uint8(name, buf, pos, **kwargs):
+def uint8(loc, buf, pos, **kwargs):
     v = buf[pos]
-    return v, 1, int_f(name, pos, v)
+    return v, 1, int_f(loc, pos, v)
 
-def uint16(name, buf, pos, **kwargs):
+def uint16(loc, buf, pos, **kwargs):
     v  = buf[pos + 0]
     v += buf[pos + 1] <<  8
-    return v, 2, int_f(name, pos, v)
+    return v, 2, int_f(loc, pos, v)
 
-def uint32(name, buf, pos, **kwargs):
+def uint32(loc, buf, pos, **kwargs):
     v  = buf[pos + 0]
     v += buf[pos + 1] <<   8
     v += buf[pos + 2] <<  16
     v += buf[pos + 3] <<  24
-    return v, 4, int_f(name, pos, v)
+    return v, 4, int_f(loc, pos, v)
 
-def array(name, buf, pos, items_struct={}, items=None, items_name=None, indent=0, struct={}):
-
-    if items:
-        out = "Fixed array of %d elements\n" % (items)
-    elif items_name:
-        
-        items = struct[items_name]
-        out ="variable array of %s (%d) elements\n" % (items_name, items)
-        
+def array(loc, buf, pos, items=None, items_struct=None, context={}):
     size = 0
     result = []
-    out = [("%20s (%8x) ] %s" % (name, pos, out))]
+    out = []
+
+    items = items.get_in(context, loc)
+
     for i in xrange(items):
-        out.append(('   ' * (indent + 1)) + 'Item %d:' % i)
-        v, s, o = evaluate(items_struct, buf, pos + size, indent + 1)
+        v, s, o = struct(loc.append(str(i)), items_struct, buf, pos + size, context=context)
         result.append(v)
         out.append(o)
-        out.append('\n')
         size += s
 
     return result, size, '\n'.join(out)
 
-def string(name, buf, pos, length=None, length_name=None, xor=0, struct={}, **kwargs):
-    if not length:
-        length = struct[length_name]
-
+def string(loc, buf, pos, length, xor=0, context={}, **kwargs):
+    length = length.get_in(context, loc)
     v = ''.join(chr(i ^ xor) for i in buf[pos:pos + length])
-    desc = "%20s (%8x) ] %s" % (name, pos, v)
+    desc = "%s %s" % (loc_f(loc, pos), v)
     return v, length, desc
 
 def data(name, buf, pos, length_name=None, struct={}, **kwargs):
     length = struct[length_name]
     v = ''.join(chr(i) for i in buf[pos:pos + length])
-    desc = "%20s (%8x) ] %s" % (name, pos, v)
+    desc = "%s %s" % (loc_f(name, pos), v)
     return v, length, desc
 
 ###########
@@ -116,7 +156,7 @@ ptifile = [ord(i) for i in ptifile]
 # hexdump(ptifile)
 
 pti_desc = (
-    (string,  'header_simul', {'length': 0x40}),
+    (string,  'header_simul', {'length': fixed(0x40)}),
     (array,   'infos', {
         'items_struct': (
             (uint16, 'first_line_in_this'),
@@ -125,12 +165,12 @@ pti_desc = (
             (uint16, 'size_in_disk'),
             (uint32, 'offset'),
         ),
-        'items': 0x10,
+        'items': fixed(0x10),
     }),
     (uint16,  'header_unknown1'),
     (uint8,   'header_xor_key'),
     (uint8,   'header_unknown2'),
-    (padding, 'header_end_pad', {'size': 0x40}),
+    (padding, 'header_end_pad', {'size': fixed(0x40)}),
 )
 
 obby, sizzi, outti = evaluate(pti_desc, ptifile) # evaluate the header
@@ -141,10 +181,10 @@ pti_block = (
         'items_struct': (
             (uint16, 'line_id'),
             (uint8,  'length'),
-            (string, 'line', {'length_name': 'length', 'xor':obby['header_xor_key']}),
+            (string, 'line', {'length': relative('length'), 'xor':obby['header_xor_key']}),
             (uint8,  'unknown'),
         ),
-        'items': obby['infos'][0]['nr_of_lines'],
+        'items': fixed(obby['infos'][0]['nr_of_lines']),
     }),
 )
 
