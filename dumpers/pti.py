@@ -49,7 +49,10 @@ class loc(object):
 
     def resolve(self, name):
         if name.startswith('.'):
-            return # split string and recombine
+            comps = name.split('.')
+            abs_name = comps[-1]
+            prefix = '.'.join(comps[0:-1])
+            return loc(abs_name, prefix)
         else:
             return loc(name, self.prefix)
 
@@ -62,17 +65,23 @@ class relative(value):
         self.loc = loc
 
     def get_in(self, context, base_loc):
-        return context[str(base_loc.resolve(self.loc))]
+        x = str(base_loc.resolve(self.loc))
+
+        for key, text in context['__SUBSTS__'].iteritems():
+            x = x.replace(('{%s}' % key), str(text))
+
+        return context[x]
 
 class fixed(value):
     def __init__(self, v):
         self.v = v
 
-    def get_in(self, context, loc):
+    def get_in(self, context, loc, subst={}):
         return self.v
     
 def evaluate(struct_desc, buf, pos=0):
     context = {}
+    context['__SUBSTS__'] = {}
     return struct(loc(), struct_desc, buf, pos, context)
 
 def struct(loc, struct_desc, buf, pos=0, context={}):
@@ -136,16 +145,31 @@ def array(loc, buf, pos, items=None, items_struct=None, context={}):
 
     return result, size, '\n'.join(out)
 
-def string(loc, buf, pos, length, xor=0, context={}, **kwargs):
+def block(loc, buf, pos, offset=None, items_struct=None, count=None, ignore_if_zero=None, context={}):
+    result = []
+    out = []
+    size = 0
+
+    count = count.get_in(context, loc)
+    for i in xrange(count):
+        context['__SUBSTS__']['i'] = i
+
+        if ignore_if_zero and (ignore_if_zero.get_in(context, loc) == 0):
+            continue
+
+        pos = offset.get_in(context, loc) 
+        v, s, o = struct(loc.append(i), items_struct, buf, pos, context=context)
+        result.append(v)
+        out.append(o)
+
+        size += s
+    return result, size, '\n'.join(out)
+        
+def string(loc, buf, pos, length, xor=fixed(0), context={}, **kwargs):
     length = length.get_in(context, loc)
+    xor = xor.get_in(context, loc)
     v = ''.join(chr(i ^ xor) for i in buf[pos:pos + length])
     desc = "%s %s" % (loc_f(loc, pos), v)
-    return v, length, desc
-
-def data(name, buf, pos, length_name=None, struct={}, **kwargs):
-    length = struct[length_name]
-    v = ''.join(chr(i) for i in buf[pos:pos + length])
-    desc = "%s %s" % (loc_f(name, pos), v)
     return v, length, desc
 
 ###########
@@ -171,29 +195,27 @@ pti_desc = (
     (uint8,   'header_xor_key'),
     (uint8,   'header_unknown2'),
     (padding, 'header_end_pad', {'size': fixed(0x40)}),
+    (block,   'pti_blocks', {
+        'offset': relative('.infos.{i}.offset'),
+        'items_struct': (
+            (array, 'lines', {
+                'items_struct': (
+                    (uint16, 'line_id'),
+                    (uint8,  'length'),
+                    (string, 'line', {'length': relative('length'),
+                                      'xor':    relative('.header_xor_key')}),
+                    (uint8,  'unknown'),
+                ),
+                'items': relative('.infos.{i}.nr_of_lines'),
+            }),
+        ),
+        'count': fixed(0x10),
+        'ignore_if_zero': relative('.infos.{i}.first_line_in_this'),
+    })
 )
 
-obby, sizzi, outti = evaluate(pti_desc, ptifile) # evaluate the header
+obby, sizzi, outti = evaluate(pti_desc, ptifile)
 print outti
 
-pti_block = (
-    (array, 'lines', {
-        'items_struct': (
-            (uint16, 'line_id'),
-            (uint8,  'length'),
-            (string, 'line', {'length': relative('length'), 'xor':obby['header_xor_key']}),
-            (uint8,  'unknown'),
-        ),
-        'items': fixed(obby['infos'][0]['nr_of_lines']),
-    }),
-)
-
-un, du, tr = evaluate(pti_block, ptifile, pos=obby['infos'][0]['offset'])
-
-print tr
-
 import pprint
-#pprint.pprint(obby)
-#print tr
-#print outti
-#print sizzi
+pprint.pprint(obby)
