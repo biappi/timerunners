@@ -80,11 +80,43 @@ def evaluate(struct_desc, buf, pos=0):
     context['__SUBSTS__'] = {}
     return struct(loc(), struct_desc, buf, pos, context)
 
+class counter_buffer(object):
+    def __init__(self, b):
+        self.backing = b
+        self.what_was_read = bytearray(len(self.backing))
+
+    def __len__(self):
+        return len(self.backing)
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            self.what_was_read[key] = 1
+            return self.backing[key]
+        if isinstance(key, slice):
+            result = self.backing[key]
+            self.what_was_read[key] = (1,) * len(result)
+            return result
+
+    def summary(self):
+        read = 0
+        not_read = 0
+
+        for i in self.what_was_read:
+            if i == 0:
+                not_read += 1
+            if i == 1:
+                read += 1
+        
+        print 'read %d (%.1f%%) - not read %d - total %d' % (read, read / float(len(self.backing)) * 100, not_read, len(self.backing))
+
 def dump_file(desc, path):
     buf = open(path, 'rb').read()
     buf = [ord(i) for i in buf]
+    buf = counter_buffer(buf)
     deserialized, size, dump_string = evaluate(desc, buf)
     print dump_string
+    print
+    buf.summary()
 
 
 def struct(loc, struct_desc, buf, pos=0, context={}):
