@@ -72,8 +72,24 @@ class fixed(value):
     def __init__(self, v):
         self.v = v
 
-    def get_in(self, context, loc, subst={}):
+    def get_in(self, context, loc):
         return self.v
+
+class add(value):
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+    def get_in(self, context, loc):
+        return self.a.get_in(context, loc) + self.b.get_in(context, loc)
+
+class subtract(value):
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+    def get_in(self, context, loc):
+        return self.a.get_in(context, loc) - self.b.get_in(context, loc)
 
 def evaluate(struct_desc, buf, pos=0):
     context = {}
@@ -90,8 +106,10 @@ class counter_buffer(object):
 
     def __getitem__(self, key):
         if isinstance(key, int):
+            result = self.backing[key]
             self.what_was_read[key] = 1
-            return self.backing[key]
+            return result
+
         if isinstance(key, slice):
             result = self.backing[key]
             self.what_was_read[key] = (1,) * len(result)
@@ -106,8 +124,13 @@ class counter_buffer(object):
                 not_read += 1
             if i == 1:
                 read += 1
-        
+
         print 'read %d (%.1f%%) - not read %d - total %d' % (read, read / float(len(self.backing)) * 100, not_read, len(self.backing))
+
+        for loc, read in enumerate(self.what_was_read):
+            if not read:
+                print '%08x not read (%02x)' % (loc, self.backing[loc])
+        
 
 def dump_file(desc, path):
     buf = open(path, 'rb').read()
@@ -118,6 +141,13 @@ def dump_file(desc, path):
     print
     buf.summary()
 
+
+def parse_file(desc, path):
+    buf = open(path, 'rb').read()
+    buf = [ord(i) for i in buf]
+    buf = counter_buffer(buf)
+    deserialized, size, dump_string = evaluate(desc, buf)
+    return deserialized
 
 def struct(loc, buf, pos=0, struct_desc=None, context={}):
     output = []
@@ -175,6 +205,8 @@ def array(loc, buf, pos, items=None, items_struct=None, context={}, items_includ
         items = items.get_in(context, loc)
     elif items_including:
         items = items_including.get_in(context, loc) + 1
+    else:
+        raise Exception("Can't get nr. items")
 
     for i in xrange(items):
         v, s, o = struct(loc.append(str(i)), buf, pos + size, struct_desc=items_struct, context=context)
@@ -184,16 +216,25 @@ def array(loc, buf, pos, items=None, items_struct=None, context={}, items_includ
 
     return result, size, '\n'.join(out)
 
-def block(loc, buf, pos, offset=None, items_struct=None, count=None, ignore_if_zero=None, context={}):
+def block(loc, buf, pos, offset=None, items_struct=None, count=None, count_including=None, ignore_if_zero=None, ignore_if_FFFF=None, context={}):
     result = []
     out = []
     size = 0
 
-    count = count.get_in(context, loc)
+    if count:
+        count = count.get_in(context, loc)
+    elif count_including:
+        count = count_including.get_in(context, loc) + 1
+    else:
+        raise Exception("Can't get nr. items")
+
     for i in xrange(count):
         context['__SUBSTS__']['i'] = i
 
         if ignore_if_zero and (ignore_if_zero.get_in(context, loc) == 0):
+            continue
+
+        if ignore_if_FFFF and (ignore_if_FFFF.get_in(context, loc) == 0xffff):
             continue
 
         pos = offset.get_in(context, loc) 
@@ -210,3 +251,20 @@ def string(loc, buf, pos, length, xor=fixed(0), context={}, **kwargs):
     v = ''.join(chr(i ^ xor) for i in buf[pos:pos + length])
     desc = "%s %s" % (loc_f(loc, pos), v)
     return v, length, desc
+
+def run_until(loc, buf, pos, end_byte=None, context=None):
+    value = bytearray()
+    desc = loc_f(loc, pos) + ' '
+    i = 0
+
+    while buf[pos + i] != end_byte.get_in(context, loc): 
+        value.append(buf[pos + i])
+        desc += "%02x " % buf[pos + i]
+        i += 1
+
+    # get the last        
+    value.append(buf[pos + i])
+    desc += "%02x " % buf[pos + i]
+    i += 1
+
+    return value, i, desc
