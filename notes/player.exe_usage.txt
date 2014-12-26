@@ -1,0 +1,19 @@
+Errore: n.ro parametri errati
+Esempio d'uso:
+PLAYER <f_name> <lingua> <modin> <ifman> <var> <switch> <font> <lib1> <lib2> <txt> <spl0> <spl1> <img>
+I parametri devono essere separati con SPAZIO
+  f_name = nome file da eseguire
+  lingua = id. lingua dei testi (2 caratteri.es: IT,UK,FR oppure @ per *.KEY)
+  modin  = modo attivazione (0=normale, 1=load)
+  ifman  = switch per i comandi 'IF..'(0=auto, 1=manuali)
+  var    = size max. buffer variabili
+  switch = size max. buffer switch
+  font   = size max. buffer font caratteri
+  lib1   = size max. buffer banca immagini 1
+  lib2   = size max. buffer banca immagini 2
+  lib2   = size max. buffer banca immagini 3
+  lib3   = size max. buffer banca immagini 4
+  txt    = size max. buffer testi
+  spl0   = size max. buffer sample 0
+  spl1   = size max. buffer sample 1
+  img    = size max. buffer per scaling image
