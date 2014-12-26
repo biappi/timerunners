@@ -13,38 +13,8 @@ FILE SWAPGAME\SwiVar.Tmp
 Created in seg010:01cd
 Two consecutive blobs of 0x1000 and 0x40 bytes
 
-
-FILE .Pal
-Loaded in seg006:06fe
-Header 5 bytes
-	1st index of first color in palette
-	2nd number of colors in file
-	3rd
-	4th 
-	5th must be 0x80
-
-FILE .CHV (fonts)
-header 3 bytes
-	1st ascii code of first char
-	2nd ascii code of last char (included)
-	3rd !zero ~ color
-	4th space_width
-	5th must be 0x7f
-offset table for each char
-	word
-	word
-char structure
-	word - width of glyph
-	word - 
-	byte - must be 2
-
 FILE SAVEGAME.SIM
 1. Blob sized 0x1c06
 2. Blob 0x15, name?!
 2. Blob sized 0x300
-
-FILE ELE
-	word - number of elements in file
-	dword * n - offset of elements
-
 
