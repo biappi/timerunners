@@ -115,7 +115,7 @@ class counter_buffer(object):
             self.what_was_read[key] = (1,) * len(result)
             return result
 
-    def summary(self):
+    def summary(self, print_not_read=False):
         read = 0
         not_read = 0
 
@@ -127,10 +127,11 @@ class counter_buffer(object):
 
         print 'read %d (%.1f%%) - not read %d - total %d' % (read, read / float(len(self.backing)) * 100, not_read, len(self.backing))
 
-        for loc, read in enumerate(self.what_was_read):
-            if not read:
-                print '%08x not read (%02x)' % (loc, self.backing[loc])
-        
+        if print_not_read:
+            for loc, read in enumerate(self.what_was_read):
+                if not read:
+                    print '%08x not read (%02x)' % (loc, self.backing[loc])
+            
 
 def dump_file(desc, path):
     buf = open(path, 'rb').read()
