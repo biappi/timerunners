@@ -246,11 +246,12 @@ def block(loc, buf, pos, offset=None, items_struct=None, count=None, count_inclu
         size += s
     return result, size, '\n'.join(out)
         
-def string(loc, buf, pos, length, xor=fixed(0), context={}, **kwargs):
+def string(loc, buf, pos, length, xor=fixed(0), context={}, binary=fixed(False), **kwargs):
     length = length.get_in(context, loc)
     xor = xor.get_in(context, loc)
     v = ''.join(chr(i ^ xor) for i in buf[pos:pos + length])
-    desc = "%s %s" % (loc_f(loc, pos), v)
+    desc = 'binary string (length: %x)' % length if binary.get_in(context, loc) else v
+    desc = "%s %s" % (loc_f(loc, pos), desc)
     return v, length, desc
 
 def run_until(loc, buf, pos, end_byte=None, context=None):
@@ -269,3 +270,4 @@ def run_until(loc, buf, pos, end_byte=None, context=None):
     i += 1
 
     return value, i, desc
+    
