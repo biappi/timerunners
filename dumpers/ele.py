@@ -1,6 +1,8 @@
 from dumper import *
 import sys
 
+FILENAME = '../original/GAME_DIR/AR1/IMG/STATUS.ELE'
+
 ele_desc = (
     (uint16, 'width'),
     (uint16, 'count'),
@@ -12,6 +14,22 @@ ele_desc = (
         'items': relative('count'),
     }),
     (uint16, 'stop_mark'),
+)
+
+ele_file = (
+    (uint16, 'image_count'),
+    (array,  'relocations', {
+        'items_struct': (
+            (uint16, 'off'),
+            (uint16, 'seg'),
+        ),
+        'items': relative('image_count'),
+    }),
+    (block, 'eles', {
+        'offset': add(relative('.relocations.{i}.off'), fixed(2)),
+        'items_struct': ele_desc,
+        'count': relative('image_count'),
+    }),
 )
 
 def draw_ele(ele, col=1, p=None):
@@ -70,3 +88,9 @@ def draw_ele(ele, col=1, p=None):
             if consecutive_ff == 3:
                 return
 
+if __name__ == '__main__':
+    x = parse_file(ele_file, FILENAME)
+
+    for e in x['eles']:
+        draw_ele(e)
+        print '-------'
