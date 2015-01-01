@@ -32,6 +32,11 @@ class Debugger(cmd.Cmd):
     def __init__(self, host='localhost', port=6969):
         cmd.Cmd.__init__(self)
         self.cli = Client(host, port)
+        self.post_cmd('')
+
+    def post_cmd(self, line):
+        cpu = self.get_registers()
+        self.prompt = '%04x:%04x ] ' % (cpu['cs'], cpu['eip'])
 
     def get_data(self, address, size):
         data_string = self.cli.command('showmemory %s %x' % (address, size))
@@ -85,4 +90,10 @@ class Debugger(cmd.Cmd):
 
 if __name__ == '__main__':
     dbg = Debugger()
-    dbg.cmdloop()
+    try:
+        dbg.cmdloop()
+    except KeyboardInterrupt:
+        print
+        print "Fuckoff"
+        sys.exit()
+
