@@ -3,6 +3,12 @@ import cmd
 import pprint
 import sys
 import imageutils
+import readline
+
+if 'libedit' in readline.__doc__:
+    readline.parse_and_bind("bind ^I rl_complete")
+else:
+    readline.parse_and_bind("tab: complete")
 
 class Client(object):
     def __init__(self, host='localhost', port=6969):
