@@ -1,7 +1,6 @@
 from dumper import *
+from pal import load_palette
 import sys
-
-FILENAME = '../original/GAME_DIR/AR1/IMG/STATUS.ELE'
 
 ele_desc = (
     (uint16, 'width'),
@@ -120,8 +119,11 @@ def show_ele(ele, palette, col=1, mult=1):
     i.image.show(palette, mult)
 
 if __name__ == '__main__':
+    FILENAME = '../original/GAME_DIR/AR1/IMG/TR.ELE'
     x = parse_file(ele_file, FILENAME)
 
+    pal_file = "../original/GAME_DIR/AR1/STA/ARCADE.PAL"
+    palette = load_palette(pal_file)
+
     for e in x['eles']:
-        draw_ele(e)
-        print '-------'
+        show_ele(e, palette, -63, 3)
