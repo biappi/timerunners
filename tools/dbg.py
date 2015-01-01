@@ -123,14 +123,9 @@ class Debugger(cmd.Cmd):
     def __init__(self, host='localhost', port=6969):
         cmd.Cmd.__init__(self)
         self.cli = Client(host, port)
-        self.postcmd(None, None)
         self.names = NamesMap()
         self.names.load()
         self.names.save()
-
-    def postcmd(self, x, y):
-        cpu = self.get_registers()
-        self.prompt = '%04x:%04x ] ' % (cpu['cs'], cpu['eip'])
 
     def get_data(self, address, size):
         data_string = self.cli.command('showmemory %s %x' % (address, size))
