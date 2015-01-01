@@ -2,10 +2,11 @@ import Tkinter
 import os
 
 class Image(object):
-    def __init__(self, width, height, data=None):
-        self.width  = width
-        self.height = height
-        self.data   = list(data) if data else [0] * width * height
+    def __init__(self, width, height, data=None, palette=None):
+        self.width   = width
+        self.height  = height
+        self.data    = list(data) if data else [0] * width * height
+        self.palette = palette
 
     def put(self, x, y, c):
         assert x < self.width
@@ -31,7 +32,10 @@ class Image(object):
 
         return ' '.join(generate_string())
 
-    def show(self, palette, mult=1):
+    def show(self, palette=None, mult=1):
+        if palette is None:
+            palette = self.palette
+
         t = Tkinter.Tk()
         t.resizable(0, 0)
 

@@ -27,24 +27,30 @@ class Debugger(cmd.Cmd):
         cmd.Cmd.__init__(self)
         self.cli = Client(host, port)
 
-    def do_vgascreen(self, line):
-        data    = self.cli.command('showmemory a000:0000 fa00')
-        palette = self.cli.command('dumppal')
+    def get_data(self, address, size):
+        data_string = self.cli.command('showmemory %s %x' % (address, size))
+        data = bytearray(size)
+        data_offset = 0
 
-        def yield_color_bytes():
-            for i, l in enumerate(data.splitlines()):
-                if not l.startswith('O:'):
-                    continue
-
+        for l in data_string.splitlines():
+            if l.startswith('O:'):
                 l = l[15:]  # strips 'O: A000:XXXX  '
 
                 for byte in l.split():
-                    yield int(byte, 16)
+                    data[data_offset] = int(byte, 16)
+                    data_offset += 1
+    
+        return data
 
-        image = imageutils.Image(320, 200, yield_color_bytes())
-        pal   = [i[3:] for i in palette.splitlines() if i.startswith('O:')]
+    def do_vgascreen(self, line):
+        bitmap  = self.get_data('a000:0000', 0xfa00)
 
-        image.show(pal)
+        palette = self.cli.command('dumppal')
+        palette = [i[3:] for i in palette.splitlines() if i.startswith('O:')]
+
+        image   = imageutils.Image(320, 200, bitmap, palette)
+
+        image.show()
 
     def default(self, line):
         if line == 'EOF':
