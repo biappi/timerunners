@@ -88,6 +88,37 @@ def draw_ele(ele, col=1, p=None):
             if consecutive_ff == 3:
                 return
 
+def show_ele(ele, palette, col=1, mult=1):
+    import imageutils
+
+    class imager(object):
+        def __init__(self):
+            self.width = ele['width']
+            self.height = ele['count']
+            self.image = imageutils.Image(self.width, self.height)
+            self.curx = 0
+            self.cury = 0
+
+        def skip(self, n):
+            for i in xrange(n):
+                self.put(0)
+
+        def put(self, n):
+            self.image.put(self.curx,
+                           self.cury,
+                           n)
+            self.curx += 1
+            assert self.curx < self.width + 1
+            # +1 because i assert after increment
+
+        def row(self):        
+            self.curx  = 0
+            self.cury += 1
+
+    i = imager()
+    draw_ele(ele, col, i)
+    i.image.show(palette, mult)
+
 if __name__ == '__main__':
     x = parse_file(ele_file, FILENAME)
 

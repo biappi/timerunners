@@ -1,5 +1,5 @@
 from dumper import *
-from ele import ele_desc, draw_ele
+from ele import ele_desc, draw_ele, show_ele
 
 FILENAME = "../original/GAME_DIR/PLR/WDW/PMOUSE.I16"
 i16_desc = (
@@ -38,12 +38,25 @@ i16_desc = (
     }),
 )
 
-dump_file(i16_desc, FILENAME)
-i16_file = parse_file(i16_desc, FILENAME)
+if __name__ == '__main__':
+    i16_file = parse_file(i16_desc, FILENAME)
 
-print
-draw_ele(i16_file['first_ele'][0])
+    def color_dict_to_string(c):
+        return "#%02x%02x%02x" % (c['r'] << 1, c['g'] << 1, c['b'] << 1)
 
-print
-draw_ele(i16_file['second_ele'][0])
+    first_color = i16_file['palette'][0]['first_color']
+    palette = ['#000000'] * 256
+    for i, color in enumerate(i16_file['palette'][0]['colors']):
+        palette[first_color + i] = color_dict_to_string(color)
+
+    show_ele(i16_file['first_ele'][0], palette, 0xf1, 3)
+    show_ele(i16_file['second_ele'][0], palette, 0xf1, 3)
+
+    """
+    print
+    draw_ele(i16_file['first_ele'][0])
+
+    print
+    draw_ele(i16_file['second_ele'][0])
+    """
 
