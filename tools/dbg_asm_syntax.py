@@ -1,6 +1,8 @@
 from pymsasid.operand import P_OSO, P_ASO, P_IMPADDR
 from pymsasid.common import DecodeException
 
+from dbg import Address
+
 ## ROBBA DI UILLI
 ## --------------
 
@@ -21,7 +23,7 @@ def intel_operand_cast(op):
         raise KeyError('Unknown operand size: %s' % str(op.size))
 
 
-def intel_operand_syntax(op):
+def intel_operand_syntax(op, names):
     """Generates assembly output for operands."""
 
     ret = list()
@@ -76,8 +78,10 @@ def intel_operand_syntax(op):
         ret.append(hex(op.pc + op.lval))
 
     elif op.type == 'OP_PTR':
-        xx = "%04x:%04x" % (op.lval.seg, op.lval.off)
-        ret.extend(['word ', xx])
+        a = Address.segoff(op.lval.seg, op.lval.off)
+        if names:
+            a = names.resolve(a)
+        ret.extend(['word ', str(a)])
 
     return ''.join(ret)
 
@@ -124,7 +128,9 @@ def syntax(self):
     # print the operands
     operands = list()
     for op in self.operand:
-        operands.append(intel_operand_syntax(op))
+        try: names = syntax.names
+        except: names = None
+        operands.append(intel_operand_syntax(op, names))
 
     ret.append(', '.join(operands))
 

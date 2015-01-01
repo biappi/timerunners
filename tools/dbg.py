@@ -12,7 +12,7 @@ if 'libedit' in readline.__doc__:
 else:
     readline.parse_and_bind("tab: complete")
 
-def decode(data, cs, ip):
+def decode(data, cs, ip, names):
     from pymsasid import pymsasid
     from dbg_asm_syntax import syntax
 
@@ -27,6 +27,7 @@ def decode(data, cs, ip):
 
     self.dis_mode = 16
     self.syntax = syntax
+    self.syntax.names = names
 
     i = 0
     try:
@@ -41,6 +42,7 @@ def decode(data, cs, ip):
             if i == 20:
                 break
     except:
+        raise
         pass
 
 class Client(object):
@@ -61,13 +63,72 @@ class Client(object):
             if sofar.splitlines()[-1].startswith('C: '):
                 return sofar
 
+class Address(object):
+    @staticmethod
+    def segoff(seg, off):
+        a = Address()
+        a.seg = seg
+        a.off = off
+        return a
+
+    @staticmethod
+    def string(s):
+        seg, off = s.split(':')
+        seg = int(seg, 16)
+        off = int(off, 16)
+        return Address.segoff(seg, off)
+
+    def linear(self):
+        return (self.seg << 8) + self.off
+
+    def __hash__(self):
+        return hash(self.linear())
+
+    def __eq__(self, o):
+        return self.linear() == o.linear()
+
+    def __str__(self):
+        return '%04X:%04X' % (self.seg, self.off)
+
+class NamesMap(object):
+    def __init__(self):
+        self.names     = {}
+        self.addresses = {}
+
+    def add(self, address, name):
+        self.addresses[name] = address
+        self.names[address] = name
+
+    def load(self, filename='timerunners.map'):
+        f = file(filename, 'r').read().splitlines()
+        for line in f:
+            try:
+                add_str, name = line.split()
+            except:
+                continue
+            add = Address.string(add_str)
+            self.add(add, name)
+
+        print 'Loaded %d names.' % len(self.addresses)
+
+    def save(self, filename='timerunners.map'):
+        f = file(filename, 'w')
+        for addr in sorted(self.names):
+            f.write('%s %s\n' % ( addr, self.names[addr]))
+
+    def resolve(self, addr):
+        return self.names.get(addr, str(addr))
+
 class Debugger(cmd.Cmd):
     def __init__(self, host='localhost', port=6969):
         cmd.Cmd.__init__(self)
         self.cli = Client(host, port)
-        self.post_cmd('')
+        self.postcmd(None, None)
+        self.names = NamesMap()
+        self.names.load()
+        self.names.save()
 
-    def post_cmd(self, line):
+    def postcmd(self, x, y):
         cpu = self.get_registers()
         self.prompt = '%04x:%04x ] ' % (cpu['cs'], cpu['eip'])
 
@@ -117,7 +178,7 @@ class Debugger(cmd.Cmd):
         reg = self.get_registers()
         data = self.get_data('%04x:%04x' % (reg['cs'], reg['eip']), 50)
         print
-        decode(data, reg['cs'], reg['eip'])
+        decode(data, reg['cs'], reg['eip'], self.names)
         print
 
     def default(self, line):
