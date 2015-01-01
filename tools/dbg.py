@@ -3,12 +3,46 @@ import cmd
 import pprint
 import sys
 import imageutils
+import dumper
+
 import readline
 
 if 'libedit' in readline.__doc__:
     readline.parse_and_bind("bind ^I rl_complete")
 else:
     readline.parse_and_bind("tab: complete")
+
+def decode(data, cs, ip):
+    from pymsasid import pymsasid
+
+    base = (cs << 8) + ip
+
+    class x: pass
+    string_data = [chr(i) for i in data]
+    self = x()
+    self.input = pymsasid.Input(pymsasid.BufferHook, string_data, base)
+    self.pc = base
+    self.error = 0
+
+    self.dis_mode = 16
+    self.syntax = pymsasid.intel.intel_syntax
+
+    i = 0
+    try:
+        while self.pc < base + len(data) and not self.error:
+            inst = pymsasid.dec.decode(self)
+
+            self.pc = inst.pc
+            inst_ip = self.pc - (cs << 8)
+            print '%04X:%04X | %s' % (cs, inst_ip, inst)
+
+            i += 1
+            if i == 20:
+                break
+    except:
+        pass
+
+    print
 
 class Client(object):
     def __init__(self, host='localhost', port=6969):
@@ -79,6 +113,11 @@ class Debugger(cmd.Cmd):
     def do_registers(self, cmd):
         import pprint
         pprint.pprint(self.get_registers())
+
+    def do_disass(self, cmd):
+        reg = self.get_registers()
+        data = self.get_data('%04x:%04x' % (reg['cs'], reg['eip']), 50)
+        decode(data, reg['cs'], reg['eip'])
 
     def default(self, line):
         if line == 'EOF':
