@@ -48,6 +48,19 @@ class Debugger(cmd.Cmd):
     
         return data
 
+    def get_registers(self):
+        registers = {}
+        registers_string = self.cli.command('showregisters')
+
+        for line in registers_string.splitlines():
+            if line.startswith('O: '):
+                name, value = line[3:].split(': ')
+                try:    value = int(value, 16)
+                except: pass
+                registers[name] = value
+
+        return registers
+        
     def do_vgascreen(self, line):
         bitmap  = self.get_data('a000:0000', 0xfa00)
 
@@ -57,6 +70,10 @@ class Debugger(cmd.Cmd):
         image   = imageutils.Image(320, 200, bitmap, palette)
 
         image.show()
+
+    def do_registers(self, cmd):
+        import pprint
+        pprint.pprint(self.get_registers())
 
     def default(self, line):
         if line == 'EOF':
