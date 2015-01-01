@@ -14,6 +14,7 @@ else:
 
 def decode(data, cs, ip):
     from pymsasid import pymsasid
+    from dbg_asm_syntax import syntax
 
     base = (cs << 8) + ip
 
@@ -25,7 +26,7 @@ def decode(data, cs, ip):
     self.error = 0
 
     self.dis_mode = 16
-    self.syntax = pymsasid.intel.intel_syntax
+    self.syntax = syntax
 
     i = 0
     try:
@@ -41,8 +42,6 @@ def decode(data, cs, ip):
                 break
     except:
         pass
-
-    print
 
 class Client(object):
     def __init__(self, host='localhost', port=6969):
@@ -117,7 +116,9 @@ class Debugger(cmd.Cmd):
     def do_disass(self, cmd):
         reg = self.get_registers()
         data = self.get_data('%04x:%04x' % (reg['cs'], reg['eip']), 50)
+        print
         decode(data, reg['cs'], reg['eip'])
+        print
 
     def default(self, line):
         if line == 'EOF':
