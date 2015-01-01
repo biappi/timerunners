@@ -50,7 +50,7 @@ class Image(object):
         i.put(self.tkinter_string(palette, mult))
         c.create_image(0, 0, image=i, anchor=Tkinter.NW)
         c.pack(expand=True, fill=Tkinter.BOTH)
-        t.bind("<Key>", lambda _: t.destroy())
+        t.bind("<Return>", lambda _: t.destroy())
 
         os.system("""osascript -e 'tell application "System Events"
             set frontmost of processes whose unix id is %d to true

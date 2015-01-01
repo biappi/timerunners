@@ -119,6 +119,9 @@ class NamesMap(object):
     def resolve(self, addr):
         return self.names.get(addr, str(addr))
 
+    def symbols(self):
+        return self.addresses.iterkeys()
+
 class Debugger(cmd.Cmd):
     def __init__(self, host='localhost', port=6969):
         cmd.Cmd.__init__(self)
@@ -171,10 +174,16 @@ class Debugger(cmd.Cmd):
 
     def do_disass(self, cmd):
         reg = self.get_registers()
-        data = self.get_data('%04x:%04x' % (reg['cs'], reg['eip']), 50)
+        data = self.get_data('%04x:%04x' % (reg['cs'], reg['eip']), 100)
         print
         decode(data, reg['cs'], reg['eip'], self.names)
         print
+
+    def do_break(self, cmd):
+        pass
+
+    def complete_break(self, text, line, begidx, endidx):
+        return [i for i in self.names.symbols() if i.startswith(text)]
 
     def default(self, line):
         if line == 'EOF':
