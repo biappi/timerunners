@@ -3,6 +3,12 @@ from ele import ele_desc, draw_ele
 
 FILENAME = "../original/GAME_DIR/AR1/MAP/ROOM.ROE"
 
+ROOM_W = 0x14
+ROOM_H = 0x14
+
+real_size_of_rooms   = 0x4f4
+real_number_of_rooms = 44
+
 room_desc = (
     (array, 'rooms', {
 
@@ -19,18 +25,16 @@ room_desc = (
                 'items_struct': (
                     (array, 'rows', {
                         'items_struct': (
-                            (uint8, 'flip'),
-                            (uint8, 'tile'),
+                            (uint16, 'tileid'),
                         ),
-                        'items': fixed(0x13),
+                        'items': fixed(ROOM_W),
                     }),
                 ),
-                'items': fixed(0x13),
+                'items': fixed(ROOM_H),
             }),
-            (string, 'unknown', ({'length': fixed(0x1fe), 'binary': fixed(True)})),
+            (string, 'unknown', ({'length': fixed(0x1b0), 'binary': fixed(True)})),
         ),
         'items': fixed(44),
-
     }),
 )
 
