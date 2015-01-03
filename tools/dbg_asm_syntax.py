@@ -86,7 +86,7 @@ def intel_operand_syntax(op, names):
     return ''.join(ret)
 
 
-def syntax(self):
+def asm_syntax(self, names=None):
     """Translates to intel syntax."""
 
     ret = list()
@@ -128,8 +128,6 @@ def syntax(self):
     # print the operands
     operands = list()
     for op in self.operand:
-        try: names = syntax.names
-        except: names = None
         operands.append(intel_operand_syntax(op, names))
 
     ret.append(', '.join(operands))

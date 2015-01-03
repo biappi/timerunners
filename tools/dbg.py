@@ -4,6 +4,7 @@ import pprint
 import sys
 import imageutils
 import dumper
+import select
 
 import readline
 
@@ -12,38 +13,43 @@ if 'libedit' in readline.__doc__:
 else:
     readline.parse_and_bind("tab: complete")
 
-def decode(data, cs, ip, names):
+def decode(data, base, cpu, names):
     from pymsasid import pymsasid
-    from dbg_asm_syntax import syntax
 
-    base = (cs << 8) + ip
+    base = base.linear()
 
     class x: pass
     string_data = [chr(i) for i in data]
     self = x()
-    self.input = pymsasid.Input(pymsasid.BufferHook, string_data, base)
+    self.input = pymsasid.Input(pymsasid.BufferHook,
+                                string_data,
+                                base)
     self.pc = base
     self.error = 0
-
     self.dis_mode = 16
-    self.syntax = syntax
-    self.syntax.names = names
+    self.syntax = None
 
+    instructions = []
     i = 0
-    try:
-        while self.pc < base + len(data) and not self.error:
+    while self.pc < base + len(data) and not self.error:
+        try:
             inst = pymsasid.dec.decode(self)
+        except:
+            self.error = 1
+            raise
+            break
 
-            self.pc = inst.pc
-            inst_ip = self.pc - (cs << 8)
-            print '%04X:%04X | %s' % (cs, inst_ip, inst)
+        inst_ip = Address.from_linear(inst.pc, cpu.cs)
+        self_ip = Address.from_linear(self.pc, cpu.cs)
 
-            i += 1
-            if i == 20:
-                break
-    except:
-        raise
-        pass
+        instructions.append((self_ip, inst))
+        self.pc = inst.pc
+
+        i += 1
+        if i == 20:
+            break
+
+    return instructions
 
 class Client(object):
     def __init__(self, host='localhost', port=6969):
@@ -53,15 +59,60 @@ class Client(object):
 
     def command(self, cmd):
         self.s.sendall(cmd + '\n')
-        return self.listen_response()
+        resp = self.listen_response()
+
+        output   = []
+        cpustate = []
+        status   = None
+
+        for l in resp.splitlines():
+            code, line = l.split(': ', 1)
+
+            if code == 'O':
+                output.append(line)
+            elif code == 'S':
+                cpustate.append(line)
+            elif code == 'C':
+                status = line
+            elif code == 'U':
+                pass # i think it's ok to ignore
+        if cpustate:
+            cpu = Cpu(cpustate)
+        else:
+            cpu = None
+
+        return output, cpu
 
     def listen_response(self):
         sofar = ''
 
         while True:
-            sofar += self.s.recv(4096)
-            if sofar.splitlines()[-1].startswith('C: '):
-                return sofar
+            try:
+                sofar += self.s.recv(4096)
+                if sofar.splitlines()[-1].startswith('C: '):
+                    return sofar
+            except socket.timeout:
+                print 'timeout..'
+
+    def check_unsolicited(self):
+        data = ''
+
+        try:
+            self.s.settimeout(.2)
+            while True:
+                data += self.s.recv(4096)
+            self.s.settimeout(None)
+        except socket.timeout:
+            pass
+
+        if not data:
+            return None
+
+        cpu = Cpu()
+        for l in (l[3:] for l in  data.splitlines() if l.startswith('U: ')):
+            cpu.update(l)
+
+        return cpu
 
 class Address(object):
     @staticmethod
@@ -76,6 +127,11 @@ class Address(object):
         seg, off = s.split(':')
         seg = int(seg, 16)
         off = int(off, 16)
+        return Address.segoff(seg, off)
+
+    @staticmethod
+    def from_linear(address, seg):
+        off = address - (seg << 8)
         return Address.segoff(seg, off)
 
     def linear(self):
@@ -96,10 +152,13 @@ class NamesMap(object):
         self.addresses = {}
 
     def add(self, address, name):
+        if name in self.addresses:
+            name = name + '_1'
+
         self.addresses[name] = address
         self.names[address] = name
 
-    def load(self, filename='timerunners.map'):
+    def load(self, filename='timerunners.map', relocate=0):
         f = file(filename, 'r').read().splitlines()
         for line in f:
             try:
@@ -107,6 +166,7 @@ class NamesMap(object):
             except:
                 continue
             add = Address.string(add_str)
+            add.seg += relocate
             self.add(add, name)
 
         print 'Loaded %d names.' % len(self.addresses)
@@ -122,6 +182,34 @@ class NamesMap(object):
     def symbols(self):
         return self.addresses.iterkeys()
 
+class Cpu(object):
+    def __init__(self, as_list=[]):
+        self.state = {}
+        self.cache = {}
+
+        for i in as_list:
+            self.update(i)
+
+    def update(self, line):
+        name, value = line.split(': ')
+        try:    value = int(value, 16)
+        except: pass
+        self.state[name] = value
+        self.cache = {}
+
+    def __getattr__(self, attr):
+        if attr in self.state:
+            return self.state[attr]
+
+    @property
+    def csip(self):
+        add = self.cache.get('csip', None)
+
+        if not add:
+            add = Address.segoff(self.cs, self.eip)
+
+        return add
+
 class Debugger(cmd.Cmd):
     def __init__(self, host='localhost', port=6969):
         cmd.Cmd.__init__(self)
@@ -129,55 +217,56 @@ class Debugger(cmd.Cmd):
         self.names = NamesMap()
         self.names.load()
         self.names.save()
+        self.names.load('ARCADE.map', 0x321f)
+        self.prompt = 'Debuggalo ] '
+        self.cpu = None
+        self.instructions = []
+
+    def check_unsolicited(self):
+        cpu = self.cli.check_unsolicited()
+        if cpu:
+            self.cpu = cpu
+
+    def postcmd(self, stop, line):
+        sys.stdout.write('\n\033[1A')
+    
+    def command(self, command):
+        resp, cpu = self.cli.command(command)
+
+        if cpu:
+            self.cpu = cpu
+
+        if self.cpu:
+            self.prompt = str(self.cpu.csip) + ' ] '
+
+        return resp
 
     def get_data(self, address, size):
-        data_string = self.cli.command('showmemory %s %x' % (address, size))
+        resp = self.command('showmemory %s %x' % (address, size))
         data = bytearray(size)
         data_offset = 0
 
-        for l in data_string.splitlines():
-            if l.startswith('O:'):
-                l = l[15:]  # strips 'O: A000:XXXX  '
+        for l in resp:
+            l = l[12:]  # strips 'O: A000:XXXX  '
 
-                for byte in l.split():
-                    data[data_offset] = int(byte, 16)
-                    data_offset += 1
+            for byte in l.split():
+                data[data_offset] = int(byte, 16)
+                data_offset += 1
     
         return data
-
-    def get_registers(self):
-        registers = {}
-        registers_string = self.cli.command('showregisters')
-
-        for line in registers_string.splitlines():
-            if line.startswith('O: '):
-                name, value = line[3:].split(': ')
-                try:    value = int(value, 16)
-                except: pass
-                registers[name] = value
-
-        return registers
         
     def do_vgascreen(self, line):
         bitmap  = self.get_data('a000:0000', 0xfa00)
 
-        palette = self.cli.command('dumppal')
-        palette = [i[3:] for i in palette.splitlines() if i.startswith('O:')]
+        palette = self.command('dumppal')
+        palette = [i for i in palette]
 
         image   = imageutils.Image(320, 200, bitmap, palette)
 
         image.show()
 
-    def do_registers(self, cmd):
-        import pprint
-        pprint.pprint(self.get_registers())
-
     def do_disass(self, cmd):
-        reg = self.get_registers()
-        data = self.get_data('%04x:%04x' % (reg['cs'], reg['eip']), 100)
-        print
-        decode(data, reg['cs'], reg['eip'], self.names)
-        print
+        self.print_code(True)
 
     def do_break(self, cmd):
         pass
@@ -185,13 +274,48 @@ class Debugger(cmd.Cmd):
     def complete_break(self, text, line, begidx, endidx):
         return [i for i in self.names.symbols() if i.startswith(text)]
 
+    def do_step(self, cmd):
+        self.command('step')
+        self.check_unsolicited()
+        self.print_code()
+
+    def do_stepi(self, cmd):
+        self.command('stepi')
+        self.check_unsolicited()
+        self.print_code()
+
     def default(self, line):
         if line == 'EOF':
             print
             print "Bye"
             sys.exit(0)
 
-        print self.cli.command(line)
+        print self.command(line)
+
+    def print_code(self, force=False):
+        from dbg_asm_syntax import asm_syntax # circular dep on Address
+
+        get_instr = True
+        get_from  = None
+
+        if not force and self.cpu:
+            try:
+                addrs = [i[0] for i in self.instructions]
+                index = addrs.index(self.cpu.csip)
+                get_instr = index > 10
+                get_from  = addrs[1]
+            except ValueError:
+                pass
+
+        if get_instr:
+            get_from_str = str(get_from) if get_from else 'cs:ip'
+            data = self.get_data(get_from_str, 100) # cs:ip will be parsed by dosbox
+            get_from = get_from if get_from else self.cpu.csip
+            self.instructions = decode(data, get_from, self.cpu, self.names)
+
+        for addr, inst in self.instructions:
+            arrow   = '->' if addr == self.cpu.csip else '  '
+            print '   %s  %s | %s' % (arrow, addr, asm_syntax(inst, self.names))
 
 if __name__ == '__main__':
     dbg = Debugger()
