@@ -150,6 +150,41 @@ class NamesMap(object):
     def __init__(self):
         self.names     = {}
         self.addresses = {}
+        self.types     = {}
+
+        self.load_all()
+
+    def save_all(self):
+        na = { str(a) : self.names[a] for a in self.names }
+        ad = { n : str(self.addresses[n]) for n in self.addresses }
+
+        import json
+        json.dump(
+            {
+                'names': na,
+                'addresses': ad,
+                'types': self.types,
+            },
+            open('state.json', 'w'),
+            indent=4,
+            sort_keys=True,
+        )
+
+    def load_all(self):
+        try:
+            import json
+            state = json.load(open('state.json', 'r'))
+
+            self.names     = state['names']
+            self.addresses = state['addresses']
+            self.types     = state['types']
+
+            self.names = { Address.string(a) : self.names[a] for a in self.names }
+            self.addresses = { n : Address.string(self.addresses[n]) for n in self.addresses }
+
+        except:
+            print 'no load'
+
 
     def add(self, address, name):
         if name in self.addresses:
@@ -159,6 +194,7 @@ class NamesMap(object):
         self.names[address] = name
 
     def load(self, filename='timerunners.map', relocate=0):
+        return
         f = file(filename, 'r').read().splitlines()
         for line in f:
             try:
@@ -170,8 +206,11 @@ class NamesMap(object):
             self.add(add, name)
 
         print 'Loaded %d names.' % len(self.addresses)
+        self.save_all()
 
     def save(self, filename='timerunners.map'):
+        return
+
         f = file(filename, 'w')
         for addr in sorted(self.names):
             f.write('%s %s\n' % ( addr, self.names[addr]))
@@ -179,8 +218,27 @@ class NamesMap(object):
     def resolve(self, addr):
         return self.names.get(addr, str(addr))
 
+    def address(self, name):
+        return self.addresses[name]
+
     def symbols(self):
         return self.addresses.iterkeys()
+
+    def set_type(self, name, the_type):
+        address = self.addresses.get(name, None)
+        if not address:
+            print 'No name', name
+            return
+
+        existing_type = self.types.get(name, None)
+        if existing_type:
+            print 'Overwriting existing type', existing_type
+
+        self.types[name] = the_type
+        self.save_all()
+
+    def variables(self):
+        self.types.iterkeys()
 
 class Cpu(object):
     def __init__(self, as_list=[]):
@@ -268,10 +326,49 @@ class Debugger(cmd.Cmd):
     def do_disass(self, cmd):
         self.print_code(True)
 
+    def do_bpm(self, cmd):
+        print self.command('bpm ' + str(self.names.address(cmd)))
+
+    def complete_bpm(self, text, line, begidx, endidx):
+        return [i for i in self.names.symbols() if i.startswith(text)]
+
     def do_break(self, cmd):
-        pass
+        print self.command('bp ' + str(self.names.address(cmd)))
 
     def complete_break(self, text, line, begidx, endidx):
+        return [i for i in self.names.symbols() if i.startswith(text)]
+
+    def do_print(self, cmd):
+        t = self.names.types[cmd]
+        print cmd, t, self.names.address(cmd)
+        if t == 'byte':
+            print 'ok'
+            print repr(self.get_data(self.names.address(cmd), 1))
+            print 'ko'
+        elif t == 'word':
+            print self.get_data(self.names.address(cmd), 2)
+        elif t == 'dword':
+            print self.get_data(self.names.address(cmd), 4)
+
+    def complete_print(self, tet, line, bi, ei):
+        return [i for i in self.names.variables() if i.startswith(text)]
+
+    def do_byte(self, cmd):
+        self.names.set_type(cmd, 'byte')
+
+    def complete_byte(self, text, line, begidx, endidx):
+        return [i for i in self.names.symbols() if i.startswith(text)]
+
+    def do_word(self, cmd):
+        self.names.set_type(cmd, 'word')
+
+    def complete_word(self, text, line, begidx, endidx):
+        return [i for i in self.names.symbols() if i.startswith(text)]
+
+    def do_dword(self, cmd):
+        self.names.set_type(cmd, 'dword')
+
+    def complete_dword(self, text, line, begidx, endidx):
         return [i for i in self.names.symbols() if i.startswith(text)]
 
     def do_step(self, cmd):
@@ -316,6 +413,16 @@ class Debugger(cmd.Cmd):
         for addr, inst in self.instructions:
             arrow   = '->' if addr == self.cpu.csip else '  '
             print '   %s  %s | %s' % (arrow, addr, asm_syntax(inst, self.names))
+
+    def do_name(self, cmd):
+        try:
+            print cmd, self.names.address(cmd)
+        except:
+            print 'no'
+
+    def complete_name(self, text, line, begidx, endidx):
+        return [i for i in self.names.symbols() if i.startswith(text)]
+
 
 if __name__ == '__main__':
     dbg = Debugger()
