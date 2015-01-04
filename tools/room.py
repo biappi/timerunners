@@ -21,6 +21,7 @@ room_desc = (
                 ),
                 'items': fixed(0x10),
             }),
+
             (array, 'tiles', {
                 'items_struct': (
                     (array, 'rows', {
@@ -32,7 +33,21 @@ room_desc = (
                 ),
                 'items': fixed(ROOM_H),
             }),
-            (string, 'unknown', ({'length': fixed(0x1b0), 'binary': fixed(True)})),
+
+            (string, 'unk', {'length':fixed(0x20), 'binary':fixed(True)}),
+
+            (array, 'tile_types', {
+                'items_struct': (
+                    (array, 'rows', {
+                        'items_struct': (
+                            (uint8, 'tiletype'),
+                        ),
+                        'items': fixed(ROOM_W),
+                    }),
+                ),
+                'items': fixed(ROOM_H),
+            }),
+
         ),
         'items': fixed(44),
     }),
