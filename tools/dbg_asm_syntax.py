@@ -23,7 +23,7 @@ def intel_operand_cast(op):
         raise KeyError('Unknown operand size: %s' % str(op.size))
 
 
-def intel_operand_syntax(op, names):
+def intel_operand_syntax(op, names, cpu):
     """Generates assembly output for operands."""
 
     ret = list()
@@ -72,10 +72,20 @@ def intel_operand_syntax(op, names):
         ret.append(']')
 
     elif op.type == 'OP_IMM':
-        ret.append(hex(op.lval))
+        if names and cpu:
+            a = Address.from_linear(op.lval, cpu.cs)
+            a = names.resolve(a)
+            ret.append(str(a))
+        else:
+            ret.append(hex(op.lval))
 
     elif op.type == 'OP_JIMM':
-        ret.append(hex(op.pc + op.lval))
+        if names and cpu:
+            a = Address.from_linear(op.pc + op.lval, cpu.cs)
+            a = names.resolve(a)
+            ret.append(str(a))
+        else:
+            ret.append(hex(op.pc + op.lval))
 
     elif op.type == 'OP_PTR':
         a = Address.segoff(op.lval.seg, op.lval.off)
@@ -86,7 +96,7 @@ def intel_operand_syntax(op, names):
     return ''.join(ret)
 
 
-def asm_syntax(self, names=None):
+def asm_syntax(self, names=None, cpu=None):
     """Translates to intel syntax."""
 
     ret = list()
@@ -128,7 +138,7 @@ def asm_syntax(self, names=None):
     # print the operands
     operands = list()
     for op in self.operand:
-        operands.append(intel_operand_syntax(op, names))
+        operands.append(intel_operand_syntax(op, names, cpu))
 
     ret.append(', '.join(operands))
 

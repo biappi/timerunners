@@ -146,11 +146,22 @@ class Address(object):
     def __str__(self):
         return '%04X:%04X' % (self.seg, self.off)
 
+class RelocationInfo(object):
+    def __init__(self, reloc, segs):
+        self.reloc = reloc
+        self.segs = {}
+        self.names = {}
+        for addr, name in segs.iteritems():
+            addr = addr + reloc
+            self.segs[addr] = name
+            self.names[name] = addr
+
 class NamesMap(object):
     def __init__(self):
         self.names     = {}
         self.addresses = {}
         self.types     = {}
+        self.relocs    = {}
 
         self.load_all()
 
@@ -240,6 +251,74 @@ class NamesMap(object):
     def variables(self):
         self.types.iterkeys()
 
+
+    def address_from_string(self, addr):
+        try:
+            return self.addresses[addr]
+        except KeyError:
+            pass
+
+        try:
+            exe, segname, off = addr.split(':', 2)
+            seg = self.relocs[exe].names[segname]
+            off = int(off, 16)
+            return Address.segoff(seg, off)
+        except ValueError:
+            pass
+        except KeyError:
+            pass
+
+        seg, off = addr.split(':', 1)
+
+        try:
+            off = int(off, 16)
+            seg = int(seg, 16)
+
+            if off > 0xffff:
+                raise ValueError
+
+            if seg > 0xffff:
+                raise ValueError
+
+            return Address.segoff(seg, off)
+        except:
+            return None
+
+    def address_to_string(self, addr):
+        try:
+            return self.names[addr]
+        except KeyError:
+            pass
+
+        for exename in self.relocs:
+            seg = self.relocs[exename].names[addr.seg]
+            return '%s:%s:%04X' % (exename, seg, addr.off)
+
+        return str(addr)
+
+    def complete_address(self, partial):
+        candidates = [name for name in self.addresses if name.startswith(partial)]
+
+        try:
+            exename, seg = partial.split(':')
+        except Exception as e:
+            exename = partial
+            seg = ''
+
+        new_candidates = ('%s:' % exename for exename in self.relocs if exename.startswith(partial))
+        candidates.extend(new_candidates)
+
+        try:
+            new_candidates = ('%s:%s:' % (exename, i) for i in self.relocs[exename].names if i.startswith(seg))
+            candidates.extend(new_candidates)
+        except Exception as e:
+            pass
+
+        return candidates            
+            
+    def set_relocations(self, exename, relocation, segs):
+        self.relocs[exename.replace('\\', '_')] = RelocationInfo(relocation, segs)
+
 class Cpu(object):
     def __init__(self, as_list=[]):
         self.state = {}
@@ -295,7 +374,7 @@ class Debugger(cmd.Cmd):
             self.cpu = cpu
 
         if self.cpu:
-            self.prompt = str(self.cpu.csip) + ' ] '
+            self.prompt = self.names.address_to_string(self.cpu.csip) + ' ] '
 
         return resp
 
@@ -333,18 +412,17 @@ class Debugger(cmd.Cmd):
         return [i for i in self.names.symbols() if i.startswith(text)]
 
     def do_break(self, cmd):
-        print self.command('bp ' + str(self.names.address(cmd)))
+        addr = self.names.address_from_string(cmd)
+        print self.command('bp ' + str(addr))
 
     def complete_break(self, text, line, begidx, endidx):
-        return [i for i in self.names.symbols() if i.startswith(text)]
+        return self.names.complete_address(text)
 
     def do_print(self, cmd):
         t = self.names.types[cmd]
         print cmd, t, self.names.address(cmd)
         if t == 'byte':
-            print 'ok'
             print repr(self.get_data(self.names.address(cmd), 1))
-            print 'ko'
         elif t == 'word':
             print self.get_data(self.names.address(cmd), 2)
         elif t == 'dword':
@@ -387,7 +465,7 @@ class Debugger(cmd.Cmd):
             print "Bye"
             sys.exit(0)
 
-        print self.command(line)
+        print '\n'.join(self.command(line))
 
     def print_code(self, force=False):
         from dbg_asm_syntax import asm_syntax # circular dep on Address
@@ -412,17 +490,40 @@ class Debugger(cmd.Cmd):
 
         for addr, inst in self.instructions:
             arrow   = '->' if addr == self.cpu.csip else '  '
-            print '   %s  %s | %s' % (arrow, addr, asm_syntax(inst, self.names))
+            print '   %s  %s | %s' % (arrow, addr, asm_syntax(inst, self.names, self.cpu))
 
     def do_name(self, cmd):
-        try:
-            print cmd, self.names.address(cmd)
-        except:
-            print 'no'
+        print cmd, self.names.address_from_string(cmd)
 
     def complete_name(self, text, line, begidx, endidx):
-        return [i for i in self.names.symbols() if i.startswith(text)]
+        return self.names.complete_address(text)
 
+    def do_get_relocations(self, cmd):
+        files = {}
+
+        for line in self.command('showrelocations'):
+            filename, info = line.split('; ')
+            _, filename = filename.split(': ')
+
+            try:
+                the_file = files[filename]
+            except:
+                the_file = {}
+                the_file['segs'] = {}
+                files[filename] = the_file
+
+            seg, name = info.split(': ')
+            if seg == 'relocation':
+                the_file['relocation'] = int(name, 16)
+            else:
+                the_file['segs'][int(seg, 16)] = name
+
+        for filename in files:
+            print 'Relocated', filename, 'at %04x' % files[filename]['relocation']
+            for seg, name in files[filename]['segs'].iteritems():
+                print ' ', name, ': ', seg
+
+            self.names.set_relocations(filename, files[filename]['relocation'], files[filename]['segs'])
 
 if __name__ == '__main__':
     dbg = Debugger()
