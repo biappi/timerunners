@@ -1,0 +1,49 @@
+manager.exe
+
+added segment seg000 0x020e
+added segment seg001 0x0244
+added segment seg002 0x0271
+added segment seg003 0x02e6
+added segment seg004 0x0556
+added segment seg005 0x05a3
+added segment seg006 0x05a8
+added segment seg007 0x0646
+added segment seg008 0x07a8
+added segment seg009 0x07cd
+added segment seg010 0x07dc
+added segment seg011 0x0826
+added segment seg012 0x08a0
+added segment seg013 0x08c1
+added segment seg014 0x091f
+added segment seg015 0x092b
+added segment seg016 0x0a8c
+added segment seg017 0x0e3b
+added segment seg018 0x0c6f
+added segment seg019 0x0c76
+added segment seg020 0x0c8a
+added segment seg021 0x0ca9
+added segment seg022 0x0d0b
+
+arcade.exe
+
+added segment seg000 0x321f
+added segment seg001 0x32a6
+added segment seg002 0x3315
+added segment seg003 0x3544
+added segment seg004 0x3577
+added segment seg005 0x366e
+added segment seg006 0x368e
+added segment seg007 0x37b1
+added segment seg008 0x37c6
+added segment seg009 0x3824
+added segment seg010 0x38da
+added segment seg011 0x38e7
+added segment seg012 0x3b19
+added segment seg013 0x3b80
+added segment seg014 0x3c4c
+added segment seg015 0x3e83
+added segment seg016 0x3eae
+added segment seg017 0x3f52
+added segment seg018 0x3f6b
+added segment seg019 0x3fdf
+
