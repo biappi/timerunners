@@ -152,9 +152,10 @@ class RelocationInfo(object):
         self.segs = {}
         self.names = {}
         for addr, name in segs.iteritems():
-            addr = addr + reloc
+            addr = addr # + reloc
             self.segs[addr] = name
             self.names[name] = addr
+            print hex(addr), name
 
 class NamesMap(object):
     def __init__(self):
@@ -291,8 +292,11 @@ class NamesMap(object):
             pass
 
         for exename in self.relocs:
-            seg = self.relocs[exename].names[addr.seg]
-            return '%s:%s:%04X' % (exename, seg, addr.off)
+            try:
+                seg = self.relocs[exename].segs[addr.seg]
+                return '%s:%s:%04X' % (exename, seg, addr.off)
+            except KeyError:
+                pass
 
         return str(addr)
 
@@ -391,7 +395,10 @@ class Debugger(cmd.Cmd):
                 data_offset += 1
     
         return data
-        
+
+    def do_continue(self, line): self.default('continue')
+    def do_bplist  (self, line): self.default('bplist')
+
     def do_vgascreen(self, line):
         bitmap  = self.get_data('a000:0000', 0xfa00)
 
@@ -520,9 +527,6 @@ class Debugger(cmd.Cmd):
 
         for filename in files:
             print 'Relocated', filename, 'at %04x' % files[filename]['relocation']
-            for seg, name in files[filename]['segs'].iteritems():
-                print ' ', name, ': ', seg
-
             self.names.set_relocations(filename, files[filename]['relocation'], files[filename]['segs'])
 
 if __name__ == '__main__':
