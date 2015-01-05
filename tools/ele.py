@@ -120,6 +120,9 @@ def show_ele(ele, palette, col=1, mult=1):
 
 if __name__ == '__main__':
     FILENAME = '../original/GAME_DIR/AR1/IMG/TR.ELE'
+    FILENAME = '../original/GAME_DIR/AR1/IMG/K.ELE'
+    FILENAME = '../original/GAME_DIR/AR1/UCC/UCCI1.ELE'
+
     x = parse_file(ele_file, FILENAME)
 
     pal_file = "../original/GAME_DIR/AR1/STA/ARCADE.PAL"
