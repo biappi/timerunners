@@ -18,7 +18,7 @@ rooms   = parse_file(room_desc, ROOM_ROE)
 
 # = #
 
-room = rooms['rooms'][7]
+room = rooms['rooms'][0]
 
 IMAGE_W = ROOM_W * TILE_W
 IMAGE_H = ROOM_H * TILE_H
@@ -60,9 +60,13 @@ def get_mat(mat):
 
 for y in xrange(ROOM_H):
     for x in xrange(ROOM_W):
-        tile_id  = room['tiles'][y]['rows'][x]['tileid']
+        tile_id    = room['tiles']     [y]['rows'][x]['tileid']
+        tile_type  = room['tile_types'][y]['rows'][x]['tiletype']
 
-        #print '%02x' % tile_nr,
+        if tile_type != 0:
+            print '%02x' % tile_type,
+        else:
+            print '  ',
         
         tile_nr = ((tile_id & 1) << 8) + (tile_id >>8)
 
@@ -82,6 +86,6 @@ for y in xrange(ROOM_H):
         if tile:
             blit_tile(image, tile, x * TILE_W, y * TILE_H, flip)
 
-    #print
+    print
 
 image.show(palette, mult=3)
