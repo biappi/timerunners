@@ -190,6 +190,12 @@ def uint16(loc, buf, pos, **kwargs):
     v += buf[pos + 1] <<  8
     return v, 2, int_f(loc, pos, v)
 
+
+def uint16_be(loc, buf, pos, **kwargs):
+    v  = buf[pos + 0] <<  8
+    v += buf[pos + 1]
+    return v, 2, int_f(loc, pos, v)
+
 def uint32(loc, buf, pos, **kwargs):
     v  = buf[pos + 0]
     v += buf[pos + 1] <<   8
