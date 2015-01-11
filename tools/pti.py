@@ -37,4 +37,5 @@ pti_desc = (
     })
 )
 
-dump_file(pti_desc, FILENAME)
+if __name__ == '__main__':
+    dump_file(pti_desc, FILENAME)
