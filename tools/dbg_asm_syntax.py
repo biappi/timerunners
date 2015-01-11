@@ -72,12 +72,7 @@ def intel_operand_syntax(op, names, cpu):
         ret.append(']')
 
     elif op.type == 'OP_IMM':
-        if names and cpu:
-            a = Address.from_linear(op.lval, cpu.cs)
-            a = names.resolve(a)
-            ret.append(str(a))
-        else:
-            ret.append(hex(op.lval))
+        ret.append('%04X' % op.lval)
 
     elif op.type == 'OP_JIMM':
         if names and cpu:
