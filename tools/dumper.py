@@ -1,4 +1,5 @@
 # yes this is ugly.
+import itertools
 
 def hexdump(data):
     def is_print(c):
@@ -164,14 +165,24 @@ def struct(loc, buf, pos=0, struct_desc=None, context={}):
         field_loc = loc.append(field_name)
 
         v, size, desc = type_func(field_loc, buf, pos, context=context, **kwargs)
+
+        if v == '__STOP_MARKER__':
+            field_name = '__STOP_MARKER__'
+            field_loc = loc.append(field_name)
+            v = True
+
+        if v == None and size == None and desc == None:
+            continue
+
         result[field_name] = v
-
         context[str(field_loc)] = v
-
         output.append(desc)
 
         pos += size
         all_size += size
+
+        if field_name == '__STOP_MARKER__':
+            break
 
     return result, all_size, '\n'.join(output)
 
@@ -203,7 +214,7 @@ def uint32(loc, buf, pos, **kwargs):
     v += buf[pos + 3] <<  24
     return v, 4, int_f(loc, pos, v)
 
-def array(loc, buf, pos, items=None, items_struct=None, context={}, items_including=None):
+def array(loc, buf, pos, items=None, items_struct=None, run_until=None, context={}, items_including=None):
     size = 0
     result = []
     out = []
@@ -212,14 +223,33 @@ def array(loc, buf, pos, items=None, items_struct=None, context={}, items_includ
         items = items.get_in(context, loc)
     elif items_including:
         items = items_including.get_in(context, loc) + 1
-    else:
-        raise Exception("Can't get nr. items")
+    elif run_until:
+        run_until = run_until.get_in(context, loc)
 
-    for i in xrange(items):
-        v, s, o = struct(loc.append(str(i)), buf, pos + size, struct_desc=items_struct, context=context)
-        result.append(v)
-        out.append(o)
-        size += s
+    if run_until:
+        while True:
+            v, s, o = struct(loc.append(str(i)), buf, pos + size, struct_desc=items_struct, context=context)
+            result.append(v)
+            out.append(o)
+            size += s
+
+            if v == run_until:
+                break
+
+    else:
+        if items: it = xrange(items)
+        else:     it = itertools.count()
+
+        for i in it:
+            field_loc = loc.append(str(i))
+
+            v, s, o = struct(field_loc, buf, pos + size, struct_desc=items_struct, context=context)
+            if context.get(str(field_loc.append('__STOP_MARKER__')), False):
+                break
+
+            result.append(v)
+            out.append(o)
+            size += s
 
     return result, size, '\n'.join(out)
 
@@ -244,14 +274,30 @@ def block(loc, buf, pos, offset=None, items_struct=None, count=None, count_inclu
         if ignore_if_FFFF and (ignore_if_FFFF.get_in(context, loc) == 0xffff):
             continue
 
+        field_loc = loc.append(i)
         pos = offset.get_in(context, loc) 
-        v, s, o = struct(loc.append(i), buf, pos, struct_desc=items_struct, context=context)
+        v, s, o = struct(field_loc, buf, pos, struct_desc=items_struct, context=context)
         result.append(v)
         out.append(o)
 
         size += s
+
+        if context.get(str(field_loc.append('__STOP_MARKER__')), False):
+            break
+
     return result, size, '\n'.join(out)
-        
+
+def stop_if(loc, buf, pos, context={}, is_zero=None):
+    if is_zero:
+        is_zero = is_zero.get_in(context, loc) == 0
+    else:
+        raise "cannot get stop marker"
+
+    if is_zero:
+        return '__STOP_MARKER__', 0, 'Field ends'
+    else:
+        return None, None, None
+
 def string(loc, buf, pos, length, xor=fixed(0), context={}, binary=fixed(False), **kwargs):
     length = length.get_in(context, loc)
     xor = xor.get_in(context, loc)
