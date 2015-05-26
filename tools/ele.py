@@ -87,7 +87,7 @@ def draw_ele(ele, col=1, p=None):
             if consecutive_ff == 3:
                 return
 
-def show_ele(ele, palette, col=1, mult=1):
+def show_ele(ele, palette, col=1, mult=1, filename=None):
     import imageutils
 
     class imager(object):
@@ -116,17 +116,22 @@ def show_ele(ele, palette, col=1, mult=1):
 
     i = imager()
     draw_ele(ele, col, i)
-    i.image.show(palette, mult)
+
+    if not filename:
+        i.image.show(palette, mult)
+    else:
+        i.image.save_image(palette, mult, filename)
 
 if __name__ == '__main__':
-    FILENAME = '../original/GAME_DIR/AR1/IMG/TR.ELE'
     FILENAME = '../original/GAME_DIR/AR1/IMG/K.ELE'
-    FILENAME = '../original/GAME_DIR/AR1/UCC/UCCI1.ELE'
+    FILENAME = '../original/GAME_DIR/AR1/UCC/UCCI0.ELE'
+    FILENAME = '../original/GAME_DIR/AR1/IMG/TR.ELE'
 
     x = parse_file(ele_file, FILENAME)
 
     pal_file = "../original/GAME_DIR/AR1/STA/ARCADE.PAL"
     palette = load_palette(pal_file)
 
-    for e in x['eles']:
-        show_ele(e, palette, -63, 3)
+    for i, e in enumerate(x['eles']):
+        print i
+        show_ele(e, palette, -63, 1, filename='%d.gif' % i)

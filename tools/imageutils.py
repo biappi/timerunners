@@ -32,6 +32,11 @@ class Image(object):
 
         return ' '.join(generate_string())
 
+    def create_image(self, palette, mult):
+        i = Tkinter.PhotoImage()
+        i.put(self.tkinter_string(palette, mult))
+        return i
+
     def show(self, palette=None, mult=1):
         if palette is None:
             palette = self.palette
@@ -46,8 +51,8 @@ class Image(object):
             highlightthickness=0,
         )
 
-        i = Tkinter.PhotoImage()
-        i.put(self.tkinter_string(palette, mult))
+        i = self.create_image(palette, mult)
+
         c.create_image(0, 0, image=i, anchor=Tkinter.NW)
         c.pack(expand=True, fill=Tkinter.BOTH)
         t.bind("<Return>", lambda _: t.destroy())
@@ -58,3 +63,10 @@ class Image(object):
 
         t.mainloop()
 
+    def save_image(self, palette, mult, name):
+        if palette is None:
+            palette = self.palette
+
+        t = Tkinter.Tk()
+        i = self.create_image(palette, mult)
+        i.write(name)
