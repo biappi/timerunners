@@ -1,0 +1,437 @@
+    1 (   1) - Premi Esc per annullare
+    2 (   2) - Ritorno al menó principale
+    3 (   3) - Nessun gioco salvato
+    4 (   4) - Sei sicuro di voler uscire (S/N)
+    5 (   5) - Premi INVIO quando sei pronto
+    6 (   6) - Pausa
+    7 (   7) - [charYes]=S
+    8 (   8) - [charNo]=N
+    9 (   9) - Esc per il menó precedente
+   10 (   a) - Metti la leva del Joystick 
+   11 (   b) - in alto a sinistra
+   12 (   c) - in basso a destra
+   13 (   d) - oppure ESC se non vuoi usare il Joystick
+   14 (   e) - ERRORE nella calibrazione
+   15 (   f) - del Joystick 
+   16 (  10) - Riprova oppure premi ESC per
+   17 (  11) - giocare senza usare il Joystick
+  101 (  65) - Inizia nuovo gioco
+  102 (  66) - Carica gioco
+  103 (  67) - Salva gioco
+  104 (  68) - Ritorna al gioco
+  105 (  69) - Configura
+  106 (  6a) - Esci
+  120 (  78) - Configurazione
+  121 (  79) - Musica
+  122 (  7a) - Effetti sonori
+  123 (  7b) - Suoni : 
+  124 (  7c) - Joystick
+  125 (  7d) - Mouse
+  140 (  8c) - Salvataggio
+  160 (  a0) - Caricamento
+  180 (  b4) - Dispositivo musicale
+  181 (  b5) - Nessuno
+  182 (  b6) - Speaker
+  183 (  b7) - Ad-Lib
+  999 ( 3e7) - NOT
+ 1000 ( 3e8) - EhilÖ, Lucas! Come te la passi?
+ 1010 ( 3f2) - Abbastanza bene Max...
+ 1011 ( 3f3) -  Sto lavorando alla mia ultima invenzione...
+ 1020 ( 3fc) - Ah, sç? Sai, oggi ä il compleanno di Jessica...
+ 1030 ( 406) - Interessante... Ma ti stavo spiegando... Questa ä una macchina...
+ 1040 ( 410) - Sai... Le voglio regalare un anello... Spero che le piaccia...
+ 1050 ( 41a) - Bene. bene... Sai, ä tanto che penso a come realizzarla...
+ 1051 ( 41b) -  Ed ora penso di poterci riuscire...
+ 1060 ( 424) - OK, Lucas. Fa sempre piacere scambiare quattro chiacchiere con un
+ 1061 ( 425) -  amico con cui sei sulla stessa lunghezza d'onda... Ora vado, ciao!
+ 1070 ( 42e) - OK, ciao e a presto, Max!
+ 1122 ( 462) -  
+ 1123 ( 463) -  
+ 1124 ( 464) - Non posso prenderlo.
+ 1125 ( 465) - Facendo leva qui...
+ 1126 ( 466) - Mi serve qualcosa per fare leva$ a mani nude non riesco!
+ 1131 ( 46b) - Mi sa che taglia un casino quel dente...
+ 1132 ( 46c) -  
+ 1133 ( 46d) - Devo stare attento a non tagliarmi mentre prendo il dente.
+ 1134 ( 46e) -  
+ 1135 ( 46f) -  
+ 1136 ( 470) - Se lo forzo rischio di tagliarmi.
+ 1141 ( 475) -  
+ 1142 ( 476) -  
+ 1143 ( 477) -  
+ 1144 ( 478) -  
+ 1145 ( 479) -  
+ 1146 ( 47a) -  
+ 1151 ( 47f) - Che dente a punta...
+ 1154 ( 482) - Non credo possa servirmi.
+ 1156 ( 484) - Non voglio romperlo.
+ 2000 ( 7d0) - Ciao Max!!!
+ 2010 ( 7da) - Ciao, luce dei miei occhi...
+ 2020 ( 7e4) - Ti ricordi che giorno ä oggi?
+ 2030 ( 7ee) - ... Festa Nazionale?
+ 2040 ( 7f8) - Il giorno... della Doccia!!!
+ 2050 ( 802) - Dovrebbe essere... Il giorno del tuo compleanno!
+ 2060 ( 80c) - Smettila di scherzare, Max!
+ 2070 ( 816) -  Lo sai che oggi ä il mio compleanno!
+ 2080 ( 820) - Cosa mi hai portato?
+ 2090 ( 82a) - Un anello!
+ 2100 ( 834) - Del carbone!
+ 2110 ( 83e) - Perchä, dovevo portarti qualcosa?
+ 2120 ( 848) - Ma... Max, ä bellissimo...
+ 2130 ( 852) - Eh, Eh... Non credi che mi meriti un bacio?
+ 2140 ( 85c) - Credo proprio di sç.
+ 2150 ( 866) - Dai, non farmi soffrire... Dimmi cosa mi hai portato...
+ 2160 ( 870) - Max, sei il solito insensibile!
+ 2170 ( 87a) - Ehi piccola, stavo solo scherzando...
+ 3000 ( bb8) - Ma... Ma dove accidenti siamo finiti?!
+ 3010 ( bc2) - Non ne ho la pió pallida idea...
+ 3020 ( bcc) -  Temo di aver sbagliato qualcosa...
+ 3030 ( bd6) - Acc... Il solito incompetente...
+ 3031 ( bd7) -  Devono averti invertito i cavi
+ 3032 ( bd8) -  neurotrasmettitori del cervello con quelli dei piedi!
+ 3040 ( be0) - Ehi, ma... Guarda, capo... Chi saranno mai questi?!
+ 3050 ( bea) - Non importa... A noi interessa l'anello!!!
+ 3060 ( bf4) - Ehi! Il mio anello!!!
+ 3070 ( bfe) - Per evitare troppe storie, verrai con noi anche tu!!!
+ 3080 ( c08) - NO! NO! JEESSIICAA!!!
+ 4000 ( fa0) - Lucas, Lucas!!!
+ 4010 ( faa) - Ehi, che c'e di tanto grave! Non sarÖ mai peggio di quello che ä
+ 4011 ( fab) -  successo a me!!!
+ 4015 ( faf) - Ma...
+ 4020 ( fb4) - Devo aver sbagliato i calcoli! Tutto da rifare! Un'interferenza... Per
+ 4021 ( fb5) -  forza!
+ 4030 ( fbe) - Ma che stai dicendo?
+ 4040 ( fc8) - Ma sç, dai! La macchina del tempo! Si doveva aprire una porta
+ 4041 ( fc9) -  temporale... e si ä aperta, ma chissÖ dove!
+ 4050 ( fd2) - Te lo dico io, RAZZA DI STUPIDO!!!
+ 4060 ( fdc) - Mmm...
+ 4070 ( fe6) - A casa di Jessica si ä aperta!!! E sono usciti dei robot
+ 4071 ( fe7) -  parlanti che l'hanno rapita!!!
+ 4080 ( ff0) - Ma... Ma come ä successo?
+ 4090 ( ffa) - Ero da Jessica, le avevo portato l'anello per il suo compleanno...
+ 4100 (1004) - Ora ho capito!!! Su quell'anello ci doveva essere una pietra che ha
+ 4110 (100e) -  provocato un'interferenza temporale!
+ 4120 (1018) - Potresti spiegarti meglio?
+ 4130 (1022) - Vedi, probabilmente quei robot di cui mi hai detto stavano
+ 4131 (1023) -  viaggiando nel tempo...
+ 4132 (1024) -  Io intanto stavo mettendo a punto la mia macchina del tempo
+ 4133 (1025) -  e tentavo di farla funzionare...E tu portavi il regalo a Jessica...
+ 4134 (1026) -  Cosç, la pietra posta sull'anello ha creato un'interferenza
+ 4135 (1027) -  che ha permesso a quegli automi di trovarsi
+ 4136 (1028) -  improvvisamente in casa di Jessica!!!
+ 4140 (102c) - Lucas, o sei il pió grande inventore di tutti i tempi, o ti sei
+ 4141 (102d) -  completamente bevuto il cervello!!!
+ 4150 (1036) - Presto! Dammi la tua macchina del tempo, devo andare a ritrovare
+ 4151 (1037) -  Jessica.
+ 4160 (1040) - Certo, potrai usare lo scooter!
+ 4170 (104a) - Uno scooter!?!?!? Ma io ho bisogno di viaggiare nel tempo... Non per
+ 4171 (104b) -  la cittÖ!!!
+ 4180 (1054) - Ehi, calma! Lo scooter ä la macchina che
+ 4181 (1055) -  ti permetterÖ di viaggiare nel tempo...
+ 4182 (1056) -  E' sicuramente simile a quella impiegata dai robots!
+ 4190 (105e) - OK, va bene... pió si parla pió stento a credere a quello che mi dici...
+ 4191 (105f) -  Ma non ho alternative! Andiamo!!!
+ 4200 (1068) - D'accordo. Seguimi! Ma devi assolutamente tenere a mente alcune
+ 4201 (1069) -  cose...
+ 4210 (1072) - E cioä...
+ 4220 (107c) - Cioä che puoi usare qualsiasi combustibile, ma che ogni pieno
+ 4221 (107d) -  ti permetterÖ di compiere un solo viaggio...
+ 4230 (1086) - Sç, d'accordo, credo di aver capito. Ora andiamo presto...
+ 5000 (1388) - Ma... Ma... Tu chi sei?
+ 5010 (1392) - Mi presento: sono il Bounty Killer, il cacciatore di taglie.
+ 5020 (139c) - Piacere, Max: ma che ci fai tu qui, scusa?
+ 5030 (13a6) - Non ci credo... Mi sembra di sognare...
+ 5040 (13b0) - Spero anch'io che si tratti di un sogno... anche perchä...
+ 5050 (13ba) - A dire il vero non lo so nemmeno io... Avevo trovato una pietra che
+ 5051 (13bb) -  brillava, a terra, e poi...
+ 5060 (13c4) - ... Si ä aperta una specie di porta rilucente che ti ha trascinato qui!
+ 5070 (13ce) - Ma... Sç, ma tu come fai a saperlo?
+ 5080 (13d8) - Vedi, oggi ä successa la stessa cosa alla mia ragazza.
+ 5081 (13d9) -  Ed io sono venuto
+ 5082 (13da) -  qui con il mio scooter temporale per ritrovarla...
+ 5090 (13e2) - Ah ä cosç... Beh, guarda, non credo di poterti aiutare,
+ 5091 (13e3) -  ma conta su di me se
+ 5092 (13e4) -  dovessi trovarti in difficoltÖ...
+ 5100 (13ec) - OK. Tu guardati da quei robot, non so se li hai giÖ incontrati.
+ 5101 (13ed) -  Sono pericolosi!
+ 5110 (13f6) - Sç, si chiamano Skunks!!! Tu ricorda che ä stato rubato l'uovo al
+ 5111 (13f7) -  dinosauro...
+ 5112 (13f8) -  L'ho saputo da uno di loro che sono riuscito a catturare!
+ 5120 (1400) - OK, ti ringrazio. Spero di rivederti presto. Ciao!
+ 5130 (140a) - Anch'io lo spero. Buona fortuna, ragazzo!!!
+ 6000 (1770) - Credevo di aver visto tutto o quasi nella vita,
+ 6001 (1771) -  ma non mi sarei mai
+ 6002 (1772) -  aspettato di incontrare un detective degli anni '30...
+ 6010 (177a) - Be', che c'ä di strano ragazzo?
+ 6011 (177b) -  Non hai mai sentito parlare di Jack Stone?
+ 6013 (177d) - Comunque ragazzo tieni gli occhi bene aperti! 
+ 6014 (177e) - Guardati dagli Skunks e dalle bestie che ci sono!
+ 6017 (1781) - Ricorda...i dinosauri di questa strana jungla 
+ 6018 (1782) - sono molto ghiotti di certi fiori gialli...
+ 6020 (1784) - No, ä che non pensavo di incontrarla qui!
+ 6030 (178e) - Certo, ma solo nei...
+ 6040 (1798) - Tu, piuttosto! Che ci fai qui?
+ 6050 (17a2) - Io sono Max e sto cercando la mia ragazza...
+ 6060 (17ac) - Sono alla ricerca di una persona
+ 6061 (17ad) -  che ä stata catturata da strani tipi...
+ 6070 (17b6) - Ehi, ragazzo... Ti hanno soffiato la pupa?! Non temere ho giÖ
+ 6071 (17b7) -  incastrato lo 'smilzo' e sono anch'io sulle tracce del 'gobbo'...
+ 6080 (17c0) - Ehi ragazzo, anche tu stai alle calcagna del 'gobbo'...
+ 6090 (17ca) - No, no! Ci dev'essere un equivoco... Ma tu come sei arrivato qui?
+ 6100 (17d4) - Ero riuscito ad incastrarlo, quel bastardo!
+ 6101 (17d5) -  Poi di colpo ha fatto brillare
+ 6102 (17d6) -  la pietra del suo maledetto anello e si ä aperta una porta...
+ 6110 (17de) - Sç, sç... ora capisco... E' capitata la stessa cosa a me...
+ 6120 (17e8) - Va bene, ragazzo... Ti racconterï come stanno le cose realmente...
+ 6130 (17f2) - Ci sono degli strani esseri che si chiamano Skunks che stanno cercando
+ 6131 (17f3) -  di invadere lo Spazio-Tempo...
+ 6140 (17fc) - A capo di tutto c'ä quel bastardo di King Skunk,
+ 6141 (17fd) -  il Crono-Demone!!!
+ 6142 (17fe) -  Io sono venuto da un'altra dimensione per arginare l'invasione!
+ 6150 (1806) - Ma sei solo?
+ 6160 (1810) - No, siamo in tanti, da tante dimensioni...
+ 6161 (1811) -  Ma ä troppo presto per essere
+ 6162 (1812) -  un ficcanaso, ragazzo!
+ 6170 (181a) - Ma, aiutami almeno a capire chi sono questi...
+ 6171 (181b) -  S...Kunt...Skut...
+ 6180 (1824) - SKUNKS!!! Sono esseri cibernetici, automi che si sono creati nel
+ 6181 (1825) -  25esimo secolo del tuo tempo...
+ 6190 (182e) - Era appena avvenuta l'automatizzazione totale dei mezzi meccanici ed
+ 6191 (182f) -  elettrici, attraverso una complicatissima rete cibernetica.
+ 6200 (1838) - La loro ä stata una sorta di ribellione...
+ 6210 (1842) - Da un Bug all'interno di questa rete
+ 6211 (1843) -  software si sono autocreati!
+ 6220 (184c) - Ora non posso perdere altro tempo, scusa...
+ 6221 (184d) -  Non posso perder di vista
+ 6222 (184e) -  il 'gobbo'!!! A presto e in bocca al lupo, ragazzo!
+ 6230 (1856) - Crepi e a presto, signor Stove...
+ 6240 (1860) - Stone, Jack Stone, ricorda ragazzo...
+ 7010 (1b62) - Salve gente, come va? Io sono Max e questi due amici che ho
+ 7011 (1b63) -  alle spalle sono Lucas e
+ 7012 (1b64) -  Jessica, la mia ragazza. Ci ä successa una cosa molto
+ 7013 (1b65) -  singolare, che ora vorremmo
+ 7014 (1b66) -  raccontarvi. Dunque, partiamo dall'inizio...
+ 7020 (1b6c) - Luogotenente!!!
+ 7030 (1b76) - Sç, Sua EntitÖ, mi dica.
+ 7040 (1b80) - Hai giÖ dato le disposizioni per l'invasione? Il popolo Skunk
+ 7050 (1b8a) -  non puï attendere ancora!!!
+ 7060 (1b94) - Ma.. Hemm... Disposizioni... Ma poi, mi scusi King Skunk, ma...
+ 7061 (1b95) -  Quale invasione?!?!?!
+ 7070 (1b9e) - Sei il solito incompetente!!! Come faccio a fidarmi ancora di te!!!
+ 7080 (1ba8) -  Dimentichi ciï che ti dico?!?!?!
+ 7090 (1bb2) - Ma sç... Forse, ma non mi ha mai... Sç, in veritÖ lei non...
+ 7100 (1bbc) - Va be', va be', sono stanco di sentirti dire fesserie!
+ 7101 (1bbd) -  Bando alle ciance!
+ 7102 (1bbe) -  Ripeterï ora le disposizioni per l'invasione spazio-temporale...
+ 7110 (1bc6) - Spazio-temporale... Mah!?!?!? Va be'...
+ 7120 (1bd0) - E vedi di non farti sfuggire nulla, questa volta!!! Altrimenti...
+ 7130 (1bda) - Mah... Sç, d'accordo, ma io non...
+ 7140 (1be4) - Dunque vediamo... I nostri Skunks migliori, dunque i...
+ 7141 (1be5) -  Che razza di colore... sç, sono i... Quelli dello stesso
+ 7142 (1be6) -  colore del... Mare, ä cosç?!?!
+ 7150 (1bee) - Sç, i Blu, Sua EntitÖ.
+ 7160 (1bf8) - GiÖ, proprio i blu! Un contingente di questi li manderemo nella
+ 7161 (1bf9) -  preistoria. Preso nota?
+ 7170 (1c02) - Sçssignore, segnato tutto.
+ 7180 (1c0c) - Sç, bene... Dunque poi... Nel medioevo inviamo le truppe di color...
+ 7181 (1c0d) -  dunque, sç quelle pió... Color del rubino, dai!
+ 7190 (1c16) - Sç, segno: le truppe rosse nel medioevo... OK.
+ 7200 (1c20) - GiÖ, proprio cosç! Mentre terremo qui con noi quelle di leva.
+ 7201 (1c21) -  Dunque... Sç quelle che chiamiamo come... Quel compositore...
+ 7210 (1c2a) - Le verdi, Sua EntitÖ. Sç, segno che le verdi rimarranno di
+ 7211 (1c2b) -  guardia qui. OK.
+ 7220 (1c34) - Bene, questi sono gli ordini! Vedi di
+ 7221 (1c35) -  eseguirli senza dimenticare niente!
+ 7222 (1c36) -  D'accordo? Voglio che sia eseguito tutto
+ 7223 (1c37) -  al pió presto! Il popolo Skunk
+ 7224 (1c38) -  dovrÖ dominare su tutto lo Spazio-Tempo conosciuto!!!
+ 7230 (1c3e) - Sçssignore! Eseguirï tutto immediatamente. Vado. I miei omaggi,
+ 7231 (1c3f) -  EntitÖ Suprema.
+10000 (2710) - Acc.. Ma che diavolo ä?!?!?!
+10010 (271a) - In che razza di guaio mi sono andato a cacciare!?!?!?
+10020 (2724) - Ma dove accidenti... ChissÖ in che foresta mi trovo...
+10030 (272e) - Non posso andare via... Prima devo trovare Jessica!
+10040 (2738) - Max dÖ il fiore, che ha trovato nella foresta, al brontosauro...
+10050 (2742) - Max dÖ l'uovo, che ha trovato nella foresta, al dinosauro...
+10060 (274c) - Uno Skunk sorprende Max e lo fa precipitare in una botola...
+10070 (2756) - Un grande teschio.
+10080 (2760) - Sembra un bivacco abbandonato...
+10090 (276a) - Il mio scooter...
+10100 (2774) - ...??...
+10110 (277e) - E' un buco che si ä formato tra i denti...
+10111 (277f) - ChissÖ che mangiava questo dinosauro!
+10120 (2788) - Questo dente ä affilatissimo!
+10130 (2792) - Com'ä aguzzo questo dente!
+10140 (279c) - Non posso prenderlo...
+10150 (27a6) - Devo stare attento a non tagliarmi mentre prendo il dente...
+10160 (27b0) - Non credo che possa servirmi...
+10170 (27ba) - Facendo leva qui...
+10180 (27c4) - Mi serve qualcosa per far leva!
+10190 (27ce) - Rischio di tagliarmi...
+10200 (27d8) - Non voglio romperlo!
+10210 (27e2) - Dall'aspetto direi che ä una pietra molto tagliente...
+10220 (27ec) - E' un bastone molto robusto...
+10230 (27f6) - E' un pezzo di legno bruciato...
+10240 (2800) - Ehi! Con questa pietra, il bastone e la liana
+10241 (2801) -  mi costruirï un'ascia!
+10250 (280a) - Per ora non saprei che farmene...
+10260 (2814) - Hmm... Potrebbe essermi utile...
+10270 (281e) - Ehi! Non voglio mica sporcarmi!
+10280 (2828) - Se lo facessi mi taglierei sicuramente!
+10290 (2832) - Non credo di riuscire a spezzarlo... Non ho mai fatto Karate!
+10300 (283c) - Riuscirei solamente a sporcarmi le mani!
+10310 (2846) - E' un albero non troppo robusto...
+10320 (2850) - E' una liana, potrebbe essermi utile per legare...
+10330 (285a) - Un fungo... ChissÖ se ä velenoso...
+10340 (2864) - Non credo di aver tanta forza per prenderlo...
+10350 (286e) - Usando il dente di dinosauro 
+10351 (286f) - dovrei riuscire a tagliarne un pezzo...
+10360 (2878) - E' attaccata all'albero, non riesco a prenderla...
+10370 (2882) - Meglio lasciarlo dov'ä... potrebbe essere velenoso...
+10380 (288c) - Mi costerÖ un po' di fatica ma...
+10390 (2896) - Non credo di poterlo abbattere a mani nude...
+10400 (28a0) - Non credo che tirando possa ottenere qualcosa...
+10410 (28aa) - Non vedo perchä dovrei calpestarlo...
+10420 (28b4) - Questa dev'essere una delle pietre del tempo...
+10430 (28be) - Sembra bloccata...
+10440 (28c8) - Forse tirando un po'...
+10450 (28d2) - Devo riuscire a liberare Jessica!
+10460 (28dc) - Cosa succederÖ a Max? 
+10461 (28dd) - Lo saprete 
+10462 (28de) - nella prossima avventura.
+11000 (2af8) - Sembra l'ingresso di un grotta
+11001 (2af9) - 
+11010 (2b02) - Una grotta. Speriamo che non ci
+11011 (2b03) - sia qualche bestia dentro
+11020 (2b0c) - E' la grotta dove ho lasciato
+11021 (2b0d) - lo scooter
+11030 (2b16) - Maledizione non posso arrivare
+11031 (2b17) - dall'altra parte saltando
+11040 (2b20) - Finalmente potrï attraversare
+11041 (2b21) - il burrone
+11050 (2b2a) - Qui dietro ci dev'essere
+11051 (2b2b) - qualcosa d'importante
+11060 (2b34) - Ma dove sono finito?
+11061 (2b35) - 
+11070 (2b3e) - Queste piante sono bellissime
+11071 (2b3f) - 
+11080 (2b48) - Spero di non fare brutti incontri
+11081 (2b49) - 
+11090 (2b52) - Dovevo studiare di pió
+11091 (2b53) - la preistoria!
+11100 (2b5c) - ChissÖ dove mi trovo!
+11101 (2b5d) - 
+11110 (2b66) - Sento dei rumori sospetti
+11111 (2b67) - 
+11120 (2b70) - Ci sono animali pericolosi
+11121 (2b71) - 
+11130 (2b7a) - Jessica deve trovarsi
+11131 (2b7b) - in questa base
+11140 (2b84) - Devo stare attento
+11141 (2b85) - agli strani esseri
+11150 (2b8e) - Non devo farmi beccare
+11151 (2b8f) - 
+11160 (2b98) - Questo posto non mi piace
+11161 (2b99) - 
+11170 (2ba2) - Sento puzza di guai
+11171 (2ba3) - 
+11180 (2bac) - Accidenti questo dinosauro
+11181 (2bad) - non mi lascia passare!
+11190 (2bb6) - Questo dev'essere l'uovo
+11191 (2bb7) - di cui parlava il Bounty Killer
+11200 (2bc0) - Forse quello ä il fiore
+11201 (2bc1) - di cui parlava Jack Stone
+28000 (6d60) -      Francesco CarlÖ|
+28001 (6d61) -           presenta
+28002 (6d62) -          TIME RUNNERS|
+28003 (6d63) -    LA PORTA DEL TEMPO
+28010 (6d6a) -          Un'edizione
+28020 (6d74) -            FABBRI
+29000 (7148) - GAME OVER
+29010 (7152) -  THE END
+29020 (715c) - PUNTI: 
+30010 (753a) - Devo trovare Jessica... 
+30011 (753b) - chissÖ dove l'hanno portata.
+30012 (753c) - Devo trovare il modo di attraversare quel burrone, 
+30013 (753d) - sono certo di trovare qualcosa dall'altra parte.
+30014 (753e) - Devo prendere la pietra altrimenti non potrï 
+30015 (753f) - viaggiare nel tempo.
+30030 (754e) - AAAAAAAAAARGH!!!
+30100 (7594) - Sembra abbastanza robusto.
+30101 (7595) -  
+30102 (7596) - E' un dente di dinosauro... 
+30103 (7597) - sembra molto tagliente.
+30104 (7598) - E' una liana, potrei legarci qualcosa.
+30105 (7599) -  
+30106 (759a) - E' una pietra molto affilata e robusta... 
+30107 (759b) - ci si potrebbe tagliare molte cose...
+30108 (759c) - Con questa accetta posso tagliare anche cose 
+30109 (759d) - molto grosse.
+30110 (759e) - E' un uovo di dinosauro.
+30111 (759f) - 
+30112 (75a0) - E' un fiore gigante.
+30113 (75a1) - 
+30136 (75b8) - Li' non c'e' proprio niente...
+30137 (75b9) -  
+34000 (84d0) -  
+34001 (84d1) - Sembra l'ingresso di una grotta.
+34002 (84d2) -  
+34003 (84d3) - Una grotta, speriamo non ci sia
+34004 (84d4) - qualche bestia dentro.
+34005 (84d5) - E' la grotta dove ho lasciato
+34006 (84d6) - lo scooter.
+34007 (84d7) - Maledizione, non posso arrivare
+34008 (84d8) - dall'altra parte saltando.
+34009 (84d9) - Finalmente potro' attraversare
+34010 (84da) - il burrone.
+34011 (84db) - Qui dietro ci deve essere qualcosa
+34012 (84dc) - di importante.
+34013 (84dd) - Ma dove sono finito?
+34014 (84de) -  
+34015 (84df) - Queste piante sono bellissime.
+34016 (84e0) -  
+34017 (84e1) - Spero di non fare brutti incontri.
+34018 (84e2) -  
+34019 (84e3) - Dovevo studiare di piu' la preistoria.
+34020 (84e4) -  
+34021 (84e5) - Chissa' dove mi trovo!
+34022 (84e6) -  
+34023 (84e7) - Sento dei rumori sospetti.
+34024 (84e8) -  
+34025 (84e9) - Ci sono animali pericolosi.
+34026 (84ea) -  
+34027 (84eb) - Jessica deve trovarsi in questa base.
+34028 (84ec) -  
+34029 (84ed) - Devo stare attento agli strani esseri.
+34030 (84ee) -  
+34031 (84ef) - Non devo farmi beccare.
+34032 (84f0) -  
+34033 (84f1) - Questo posto non mi piace.
+34034 (84f2) -  
+34035 (84f3) - Sento puzza di guai.
+34036 (84f4) -  
+34037 (84f5) - Accidenti, questo dinosauro
+34038 (84f6) - non mi lascia passare!
+34039 (84f7) - Questo deve essere l'uovo di cui
+34040 (84f8) - parlava il Bounty.
+34041 (84f9) - Forse quello e' il fiore di cui
+34042 (84fa) - parlava Jack Stone.
+35000 (88b8) - MOVIMENTO         DIREZIONE        FIRE
+35001 (88b9) - Cammina                Destra           No
+35002 (88ba) - Sale scale           Destra alto         No
+35003 (88bb) - Scende scale       Destra basso        No
+35004 (88bc) - Interagisce              Alto             No
+35005 (88bd) - Chino                   Basso             No
+35006 (88be) - Inversione             Sinistra           No
+35007 (88bf) - Parata colpo          Sinistra           Si
+35008 (88c0) - Spara                  Destra            Si
+35009 (88c1) - Entra porta             Alto             No
+35010 (88c2) - Salto in avanti      Destra alto         No
+35011 (88c3) - 
+35012 (88c4) - TASTI PARTICOLARI
+35013 (88c5) -  SPAZIO  permette di selezionare l'arma a disposizione.
+35014 (88c6) -  P       mette il gioco in pausa.
+35015 (88c7) -  ENTER   mostra un testo di aiuto relativo alla situzione.
+35016 (88c8) -  U       mostra tutte le uscite e interazioni della stanza.
+35017 (88c9) -  M       richiama la mappa del gioco.
+35018 (88ca) -  I       richiama lo status e l'inventario del protagonista
