@@ -1,10 +1,9 @@
 from dumper import *
-from ele import ele_desc, show_ele, draw_ele
-from pal import load_palette
+from ele import ele_desc, show_ele, draw_ele, line_expand_ele
 from imageutils import Image
-from bitmappe import Bitmappe
+from palette import Palette
 
-FILENAME = "../original/GAME_DIR/PLR/BNK/ANIS09.ANI"
+FILENAME = "../original/GAME_DIR/PLR/BNK/ANIX05.ANI"
 
 ani_desc = (
     (uint16,   'unused1'),
@@ -19,11 +18,13 @@ ani_desc = (
         'items_struct': {
             (uint32, 'boh'),
         },
-        'items': relative('count'),
+        'items': add(relative('count'), fixed(-1)),
     }),
 
+    (uint32, '00 ff 00 00'),
+    (uint8, '08'),
     (block, 'palette', {
-        'offset': add(relative('.palette_offset'), fixed(18)),
+        'offset': add(relative('.palette_offset'), fixed(15)),
         'items_struct': (
             (array,  'colors', {
                 'items_struct': {
@@ -31,7 +32,7 @@ ani_desc = (
                     (uint8, 'g'),
                     (uint8, 'r'),
                 },
-                'items': fixed(255),
+                'items': fixed(256),
             }),
         ),
         'count': fixed(1)
@@ -44,35 +45,39 @@ ani_desc = (
     }),
 )
 
-
 if 1:
-    ani_file = parse_file(ani_desc, FILENAME)
+    x = parse_file(ani_desc, FILENAME)
+    print x
 
-    pal = [(0, 0, 0)] * 255
+    pal = Palette.html_format_pal(x['palette'][0]['colors'])
 
-    for i, c in enumerate(ani_file['palette'][0]['colors']):
-        pal[i] = (c['r'] << 2, c['g'] << 2, c['b'] << 2)
+    ele1 = x['frames'][0]
+    width, height = ele1['width'], ele1['count']
+    img = Image(width, height)
 
-    def draw_frame(i):
-        ele1 = ani_file['frames'][0]
-        width, height = ele1['width'] + 3, ele1['count']
-        img = Image(width, height)
-        width -= 3
+    print 'w, h:', width, height
 
-        data = []
-        for y, l in enumerate(ele1['lines']):
-            line = l['line'][2:-1]
-            # TODO: this is a monkey patch, the line should be expanded properly as soon as we know how.
-            line += bytearray([0] * (width - len(line)))
-            data.append(line)
+    def line_expand_ani(l):
+        q = iter(l[:-1])
+        r = []
+        while True:
+            try:
+                r += [0] * next(q)
+                count = next(q)
+                for _ in xrange(count):
+                    r.append(next(q))
+            except StopIteration:
+                return r
 
-        Bitmappe.to_file(pal, data, width, height, 'roba.bmp')
+    for y, l in enumerate(ele1['lines']):
+        line = line_expand_ani(l['line'])
+        for x, c in enumerate(line):
+            try:
+                img.put(x, y, c)
+            except:
+                print "bad line", x, y, c
 
-        #img.show(pal, 2)
-        #img.save_image(pal, 1, 'roba.png')
-   
-    for i in xrange(ani_file['count']):
-        draw_frame(i)
-
+    img.show(pal, 2)
+    
 else:
     dump_file(ani_desc, FILENAME)

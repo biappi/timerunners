@@ -6,7 +6,7 @@ FILENAME = "../original/GAME_DIR/AR1/STA/ARCADE.PAL"
 pal_desc = (
     (uint8,   'first_color'),
     (uint8,   'count'),
-    (padding, 'unused', {'size': fixed(2) }),
+    (padding, 'unused', {'size': fixed(2)}),
     (uint8,   'must_be_80'),
     (array,   'palette', {
         'items_struct': (
@@ -33,6 +33,3 @@ def load_palette(filename):
 
 if __name__ == '__main__':
     dump_file(pal_desc, FILENAME)
-
-
-

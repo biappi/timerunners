@@ -11,12 +11,9 @@ class Bitmappe:
     @staticmethod
     def to_file(palette, data, width, height, fname, bpp=24):
         header_size = 40 + 14
-
-        #print len(data[0]), [palette[int(x)] for x in data[0]]
-
         pixel_array = bytearray([]).join(
             bytearray([]).join(
-                [bytearray([r, g, b]) for (r, g, b) in [palette[int(x)] for x in line]] +
+                [bytearray([x.b, x.g, x.r]) for x in [palette[y] for y in line]] +
                 [bytearray([] if not len(line) % 4 else [0] * (4 - (len(line) % 4)))]
             )
             for line in data[::-1]
@@ -48,7 +45,8 @@ class Bitmappe:
             # bytearray([0x00, 0xff, 0x00, 0x00]),    # Green mask
             # bytearray([0x00, 0x00, 0xff, 0x00]),    # Blue mask
             # bytearray([0x00, 0x00, 0x00, 0xff]),    # Alpha mask
-            # bytearray(self.b32(1)),                 # Color space type 00h (calibrated RGB), 01h (device-dependent RGB), and 02h (device-dependent CMYK)
+            # bytearray(self.b32(1)),                 # Color space type 00h (calibrated RGB),
+            #                                         #     01h (device-dependent RGB), and 02h (device-dependent CMYK)
             # bytearray(self.b32(0)),                 # X coordinate of red endpoint (not significant in this case)
             # bytearray(self.b32(0)),                 # Y coordinate of red endpoint (not significant in this case)
             # bytearray(self.b32(0)),                 # Z coordinate of red endpoint (not significant in this case)
@@ -63,9 +61,7 @@ class Bitmappe:
             # bytearray(self.b32(0)),                 # Gamma blue coordinate scale value
         ])
 
-        print len(header)
-
-        assert len(header) == header_size
+        #assert len(header) == header_size
 
         with open(fname, 'w+') as f:
             f.write(header)       # Writing header

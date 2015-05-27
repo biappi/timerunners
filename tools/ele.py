@@ -1,6 +1,7 @@
 from dumper import *
-from pal import load_palette
+from pal import load_palette, pal_desc
 import sys
+from palette import Palette
 from bitmappe import Bitmappe
 
 ele_desc = (
@@ -48,45 +49,11 @@ def draw_ele(ele, col=1, p=None):
 
     if p is None: p =  printer()
 
-    ele_content = reduce (lambda a, b: a + b, (l['line'] for l in ele['lines'])) + bytearray((0xff,0xff))
-    the_ele = iter(ele_content)
-
-    consecutive_ff = 0
-
-    while True:
-        skip = next(the_ele)
-
-        if skip != 0xff:
-            consecutive_ff = 0
-            p.skip(skip)
-
-            count = next(the_ele)
-
-            if count != 0xff:
-                consecutive_ff = 0
-
-                for _ in xrange(count / 2):
-                    colors = next(the_ele)
-                    color1 = (colors & 0x0f)      + col
-                    color2 = (colors & 0xf0 >> 4) + col
-
-                    p.put(color1)
-                    p.put(color2)
-
-                if count & 1:
-                    color = next(the_ele)
-                    color1 = (color & 0x0f) + col
-                    p.put(color1)
-            else:
-                consecutive_ff += 1
-                if consecutive_ff == 3:
-                    return
-        else:
-            p.row()
-
-            consecutive_ff += 1
-            if consecutive_ff == 3:
-                return
+    data = [line_expand_ele(l['line'], ele['width']) for l in ele['lines']]
+    for d in data:
+        for q in d:
+            p.put(q)
+        p.row()
 
 def show_ele(ele, palette, col=1, mult=1, filename=None):
     import imageutils
@@ -104,9 +71,7 @@ def show_ele(ele, palette, col=1, mult=1, filename=None):
                 self.put(0)
 
         def put(self, n):
-            self.image.put(self.curx,
-                           self.cury,
-                           n)
+            self.image.put(self.curx, self.cury, n)
             self.curx += 1
             assert self.curx < self.width + 1
             # +1 because i assert after increment
@@ -121,13 +86,33 @@ def show_ele(ele, palette, col=1, mult=1, filename=None):
     if not filename:
         i.image.show(palette, mult)
     else:
-        print [bytearray([i.image.get(a, b) for a in range(0, i.width)]) for b in range(0, i.height)][::-1]
-        Bitmappe.to_file(
-            [(int(r, 16), int(g, 16), int(b, 16)) for (r, g, b) in [(q[1:3], q[3:5], q[5:]) for q in palette]],
-            [bytearray([i.image.get(a, b) for a in range(0, i.width)]) for b in range(0, i.height)], i.width, i.height,
-            filename
-        )
-        #i.image.save_image(palette, mult, filename)
+        i.image.save_image(palette, mult, filename)
+
+
+def line_expand_ele(line, w):
+    q = iter(line[:-1])
+    r = []
+    c = 0xc1
+    while True:
+        try:
+            r += [0] * next(q)
+            count = next(q)
+            for _ in xrange(count / 2):
+                colors = next(q)
+                r.append((colors & 0x0f) + c)
+                r.append(((colors & 0xf0) >> 4) + c)
+            if count & 1:
+                r.append((next(q) & 0x0f) + c)
+        except StopIteration:
+            r += [0] * (w - len(r))
+            #print ['%02x' % l for l in r]
+            return r
+
+
+def bittemappe_ele(ele_item, pal_path, output_bmp):
+    palette = Palette.rgb_format_pal(parse_file(pal_desc, pal_path)['palette'])
+    bmp_data = [line_expand_ele(l['line'], ele_item['width']) for l in ele_item['lines']]
+    Bitmappe.to_file(palette, bmp_data, ele_item['width'], ele_item['count'], output_bmp)
 
 if __name__ == '__main__':
     FILENAME = '../original/GAME_DIR/AR1/IMG/K.ELE'
@@ -141,4 +126,5 @@ if __name__ == '__main__':
 
     for i, e in enumerate(x['eles']):
         print i
+        bittemappe_ele(e, pal_file, '%d.bmp' % i)
         show_ele(e, palette, -63, 1, filename='%d.gif' % i)
