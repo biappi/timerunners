@@ -1,6 +1,7 @@
 from dumper import *
 from pal import load_palette
 import sys
+from bitmappe import Bitmappe
 
 ele_desc = (
     (uint16, 'width'),
@@ -120,7 +121,13 @@ def show_ele(ele, palette, col=1, mult=1, filename=None):
     if not filename:
         i.image.show(palette, mult)
     else:
-        i.image.save_image(palette, mult, filename)
+        print [bytearray([i.image.get(a, b) for a in range(0, i.width)]) for b in range(0, i.height)][::-1]
+        Bitmappe.to_file(
+            [(int(r, 16), int(g, 16), int(b, 16)) for (r, g, b) in [(q[1:3], q[3:5], q[5:]) for q in palette]],
+            [bytearray([i.image.get(a, b) for a in range(0, i.width)]) for b in range(0, i.height)], i.width, i.height,
+            filename
+        )
+        #i.image.save_image(palette, mult, filename)
 
 if __name__ == '__main__':
     FILENAME = '../original/GAME_DIR/AR1/IMG/K.ELE'

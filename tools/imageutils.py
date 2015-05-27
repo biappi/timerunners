@@ -1,6 +1,7 @@
 import Tkinter
 import os
 
+
 class Image(object):
     def __init__(self, width, height, data=None, palette=None):
         self.width   = width
@@ -13,6 +14,10 @@ class Image(object):
         assert y < self.height
 
         self.data[y * self.width + x] = c
+
+    def get(self, x, y):
+        q = self.data[y * self.width + x]
+        return q if q >= 0 else 255 + q
 
     def tkinter_string(self, palette, mult=1):
         def generate_string():

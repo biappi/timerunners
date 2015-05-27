@@ -1,6 +1,7 @@
 # yes this is ugly.
 import itertools
 
+
 def hexdump(data):
     def is_print(c):
         return 0x20 <= c <= 0x7f
@@ -22,13 +23,16 @@ def hexdump(data):
 
     print
 
+
 def loc_f(name, pos, name_prefix=None):
     if name_prefix is not None:
         name = name_prefix + '.' + name
     return "%08x %-35s ]" % (pos, name)
 
+
 def int_f(name, pos, v):
     return "%s %x (%d)" % (loc_f(name, pos), v, v)
+
 
 class loc(object):
     def __init__(self, name='', prefix=None):
@@ -53,9 +57,11 @@ class loc(object):
         else:
             return loc(name, self.prefix)
 
+
 class value(object):
     def get_in(self, context, loc):
         raise # return None - to subclass
+
 
 class relative(value):
     def __init__(self, loc):
@@ -69,12 +75,14 @@ class relative(value):
 
         return context[x]
 
+
 class fixed(value):
     def __init__(self, v):
         self.v = v
 
     def get_in(self, context, loc):
         return self.v
+
 
 class add(value):
     def __init__(self, a, b):
@@ -84,6 +92,7 @@ class add(value):
     def get_in(self, context, loc):
         return self.a.get_in(context, loc) + self.b.get_in(context, loc)
 
+
 class subtract(value):
     def __init__(self, a, b):
         self.a = a
@@ -92,10 +101,12 @@ class subtract(value):
     def get_in(self, context, loc):
         return self.a.get_in(context, loc) - self.b.get_in(context, loc)
 
+
 def evaluate(struct_desc, buf, pos=0):
     context = {}
     context['__SUBSTS__'] = {}
     return struct(loc(), buf, pos, struct_desc=struct_desc, context=context)
+
 
 class counter_buffer(object):
     def __init__(self, b):
@@ -151,6 +162,7 @@ def parse_file(desc, path):
     deserialized, size, dump_string = evaluate(desc, buf)
     return deserialized
 
+
 def struct(loc, buf, pos=0, struct_desc=None, context={}):
     output = []
     all_size = 0
@@ -186,15 +198,18 @@ def struct(loc, buf, pos=0, struct_desc=None, context={}):
 
     return result, all_size, '\n'.join(output)
 
+
 def padding(loc, buf, pos, size, context=None, **kwargs):
     size = size.get_in(context, loc)
     for i in xrange(size):
         buf[pos + i] # mark read
     return 0, size, ('%s Padding (0x%x - %d bytes)' % (loc_f(loc, pos), size, size))
 
+
 def uint8(loc, buf, pos, **kwargs):
     v = buf[pos]
     return v, 1, int_f(loc, pos, v)
+
 
 def uint16(loc, buf, pos, **kwargs):
     v  = buf[pos + 0]
@@ -207,12 +222,14 @@ def uint16_be(loc, buf, pos, **kwargs):
     v += buf[pos + 1]
     return v, 2, int_f(loc, pos, v)
 
+
 def uint32(loc, buf, pos, **kwargs):
     v  = buf[pos + 0]
     v += buf[pos + 1] <<   8
     v += buf[pos + 2] <<  16
     v += buf[pos + 3] <<  24
     return v, 4, int_f(loc, pos, v)
+
 
 def array(loc, buf, pos, items=None, items_struct=None, run_until=None, context={}, items_including=None):
     size = 0
@@ -253,6 +270,7 @@ def array(loc, buf, pos, items=None, items_struct=None, run_until=None, context=
 
     return result, size, '\n'.join(out)
 
+
 def block(loc, buf, pos, offset=None, items_struct=None, count=None, count_including=None, ignore_if_zero=None, ignore_if_FFFF=None, context={}):
     result = []
     out = []
@@ -287,6 +305,7 @@ def block(loc, buf, pos, offset=None, items_struct=None, count=None, count_inclu
 
     return result, size, '\n'.join(out)
 
+
 def stop_if(loc, buf, pos, context={}, is_zero=None):
     if is_zero:
         is_zero = is_zero.get_in(context, loc) == 0
@@ -298,6 +317,7 @@ def stop_if(loc, buf, pos, context={}, is_zero=None):
     else:
         return None, None, None
 
+
 def string(loc, buf, pos, length, xor=fixed(0), context={}, binary=fixed(False), **kwargs):
     length = length.get_in(context, loc)
     xor = xor.get_in(context, loc)
@@ -305,6 +325,7 @@ def string(loc, buf, pos, length, xor=fixed(0), context={}, binary=fixed(False),
     desc = 'binary string (length: %x)' % length if binary.get_in(context, loc) else v
     desc = "%s %s" % (loc_f(loc, pos), desc)
     return v, length, desc
+
 
 def run_until(loc, buf, pos, end_byte=None, context=None):
     value = bytearray()
@@ -322,4 +343,4 @@ def run_until(loc, buf, pos, end_byte=None, context=None):
     i += 1
 
     return value, i, desc
-    
+
