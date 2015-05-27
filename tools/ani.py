@@ -3,7 +3,7 @@ from ele import ele_desc, show_ele, draw_ele
 from pal import load_palette
 from imageutils import Image
 
-FILENAME = "../original/GAME_DIR/PLR/BNK/ANIX01.ANI"
+FILENAME = "../original/GAME_DIR/PLR/BNK/ANIS09.ANI"
 
 ani_desc = (
     (uint16,   'unused1'),
@@ -22,13 +22,13 @@ ani_desc = (
     }),
 
     (block, 'palette', {
-        'offset': add(relative('.palette_offset'), fixed(10)),
+        'offset': add(relative('.palette_offset'), fixed(18)),
         'items_struct': (
             (array,  'colors', {
                 'items_struct': {
-                    (uint8, 'r'),
-                    (uint8, 'g'),
                     (uint8, 'b'),
+                    (uint8, 'g'),
+                    (uint8, 'r'),
                 },
                 'items': fixed(255),
             }),
@@ -43,37 +43,36 @@ ani_desc = (
     }),
 )
 
+
 if 1:
-    x = parse_file(ani_desc, FILENAME)
-    print x
+    ani_file = parse_file(ani_desc, FILENAME)
 
     pal = ['#000000'] * 256
 
-    dospal = open('palette').readlines()
-
     def color_dict_to_string(c):
-        return "#%02x%02x%02x" % (c['r'], c['b'], c['b'])
+        return "#%02x%02x%02x" % (c['r'] << 2, c['g'] << 2, c['b'] << 2)
 
-    for i, color in  enumerate(x['palette'][0]['colors']):
-        print color
+    for i, color in  enumerate(ani_file['palette'][0]['colors']):
         pal[i] = color_dict_to_string(color)
 
-    ele1 = x['frames'][0]
-    width, height = ele1['width'] + 3, ele1['count']
-    img = Image(width, height)
+    def draw_frame(i):
+        ele1 = ani_file['frames'][0]
+        width, height = ele1['width'] + 3, ele1['count']
+        img = Image(width, height)
 
-    print 'w, h:', width, height
+        for y, l in enumerate(ele1['lines']):
+            line = l['line'][2:-1]
 
-    for y, l in enumerate(ele1['lines']):
-        line = l['line'][2:-1]
+            for x, c in enumerate(line):
+                try:
+                    img.put(x, y, c)
+                except:
+                    print "bad line", x, y, c
 
-        for x, c in enumerate(line):
-            try:
-                img.put(x, y, c)
-            except:
-                print "bad line", x, y, c
+        img.show(pal, 2)
+   
+    for i in xrange(ani_file['count']):
+        draw_frame(i)
 
-    img.show(dospal, 2)
-    
 else:
     dump_file(ani_desc, FILENAME)
