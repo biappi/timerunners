@@ -45,11 +45,14 @@ ani_desc = (
 
 if 1:
     x = parse_file(ani_desc, FILENAME)
+    print x
 
     pal = ['#000000'] * 256
 
+    dospal = open('palette').readlines()
+
     def color_dict_to_string(c):
-        return "#%02x%02x%02x" % (c['g'], c['b'], c['r'])
+        return "#%02x%02x%02x" % (c['r'], c['b'], c['b'])
 
     for i, color in  enumerate(x['palette'][0]['colors']):
         print color
@@ -58,10 +61,6 @@ if 1:
     ele1 = x['frames'][0]
     width, height = ele1['width'] + 3, ele1['count']
     img = Image(width, height)
-
-
-    ARCADE_PAL  = "../original/GAME_DIR/AR1/STA/ARCADE.PAL"
-    palette  = load_palette(ARCADE_PAL)
 
     print 'w, h:', width, height
 
@@ -74,8 +73,7 @@ if 1:
             except:
                 print "bad line", x, y, c
 
-    img.show(palette, 2)
+    img.show(dospal, 2)
     
-
 else:
     dump_file(ani_desc, FILENAME)
