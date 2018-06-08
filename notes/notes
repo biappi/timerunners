@@ -1,0 +1,32 @@
+patches:
+1. remove check for tiles (mostly floor)
+2. remove check for tiles (mostly else)
+3. remove pupo_x changes when input
+4. no health for monster
+5. hide mouse ptr
+
+iv 406c:3af8 pupo_bob_x
+iv 406c:3b5c pupo_bob_y
+iv 406c:2efb current_ani
+iv 406c:2ef6 pupo_x
+iv 406c:2ef8 pupo_y
+iv 406c:2f04 vita
+iv 406c:094f delta_x
+iv 406c:0952 frame
+iv 406c:094d pupo_tr_frame
+
+sm 32a9:1823 eb 34
+sm 32a9:1865 eb 3f
+sm 32a9:1926 90 90 90 90
+sm 32a9:19b7 90 90 90 90
+sm 3aad:0211 90 90 90 90
+sm 31b3:0626 90 90 90 90 90
+
+bpm 406c:0952
+bpm 406c:094f
+bpm 406c:2efb
+bpm 406c:3af8
+
+406c:42a6 -- left_pressed
+406c:42a4 -- up_pressed
+
