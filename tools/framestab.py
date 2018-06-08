@@ -15,8 +15,8 @@ tab_desc = (
         'items_struct': (
             (array, 'frames', {
                 'items_struct': ( 
-                    (uint8, 'time'),
                     (uint8, 'frame'),
+                    (uint8, 'time'),
                     (stop_if, '', {
                         'is_zero': add(relative('time'), relative('frame')),
                     }),
