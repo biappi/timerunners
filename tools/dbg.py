@@ -412,12 +412,6 @@ class Debugger(cmd.Cmd):
     def do_disass(self, cmd):
         self.print_code(True)
 
-    def do_bpm(self, cmd):
-        print self.command('bpm ' + str(self.names.address(cmd)))
-
-    def complete_bpm(self, text, line, begidx, endidx):
-        return [i for i in self.names.symbols() if i.startswith(text)]
-
     def do_break(self, cmd):
         addr = self.names.address_from_string(cmd)
         print self.command('bp ' + str(addr))
