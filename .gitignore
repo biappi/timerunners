@@ -1,2 +1,4 @@
 *.pyc
 .*.sw?
+**/xcuserdata/**
+.DS_Store
