@@ -1,5 +1,5 @@
 EXE_SOURCE=simul.c
-EXE_NAME=simul.exe
+EXE_NAME=SIMUL.EXE
 
 # - #
 

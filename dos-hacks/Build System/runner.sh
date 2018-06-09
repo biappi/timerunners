@@ -3,8 +3,7 @@
 cp "${TARGET_BUILD_DIR}/dosroot/TR/CODS/ARCADE.EXE" "${TARGET_BUILD_DIR}/dosroot/TR/CODS/ARC_TR.EXE"
 cp "${TARGET_BUILD_DIR}/dosroot/TR/CODS/PLAYER.EXE" "${TARGET_BUILD_DIR}/dosroot/TR/CODS/PLR_TR.EXE"
 
-
-cp "${TARGET_BUILD_DIR}/simul.exe" "${TARGET_BUILD_DIR}/dosroot/TR/"
+cp "${TARGET_BUILD_DIR}/SIMUL.EXE" "${TARGET_BUILD_DIR}/dosroot/TR/"
 
 TERM=xterm "${SRCROOT}/Dos Tools/dosbox" \
     -c "mount c ${TARGET_BUILD_DIR}/dosroot/" \
@@ -12,4 +11,3 @@ TERM=xterm "${SRCROOT}/Dos Tools/dosbox" \
     -c "cd TR" \
     -c "simul" \
     2>&1 > /dev/null
-
