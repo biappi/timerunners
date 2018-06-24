@@ -48,7 +48,7 @@ class Wavino(object):
 
         return bytearray(riff_chunk + fmt_chunk + data_chunk)
 
-def main(*args):
+def main(args):
     for fid in ['01', '02', '03', '04', '05', '06', '07', '08', '09', '0A']:
         with open(FILENAME(fid), 'rb') as f:
             data = [ord(i) for i in f.read()]

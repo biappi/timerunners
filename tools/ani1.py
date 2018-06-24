@@ -1,4 +1,4 @@
-import pla
+from tr.formats import pla
 
 a = pla.Asm()
 

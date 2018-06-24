@@ -94,7 +94,7 @@ def show_ele(ele, palette, col=1, mult=1, filename=None):
     else:
         i.image.save_image(palette, mult, filename)
 
-def main(*args):
+def main(args):
     FILENAME = '../original/GAME_DIR/AR1/IMG/K.ELE'
     FILENAME = '../original/GAME_DIR/AR1/UCC/UCCI0.ELE'
     FILENAME = '../original/GAME_DIR/AR1/IMG/TR.ELE'

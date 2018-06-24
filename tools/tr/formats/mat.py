@@ -38,7 +38,7 @@ def show_tileset(filename, palette):
 
     tileset.show(palette, mult=3)
 
-def __main__(*args):
+def __main__(args):
     pal_file = "../original/GAME_DIR/AR1/STA/ARCADE.PAL"
     palette = load_palette(pal_file)
 

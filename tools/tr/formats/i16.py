@@ -3,7 +3,7 @@ from tr import dumpers
 from ele import draw_ele, show_ele
 
 
-def main(*args):
+def main(args):
     i16_file = dumpers.parse_file(dumpers.i16.desc, dumpers.i16.FILENAME)
 
     def color_dict_to_string(c):

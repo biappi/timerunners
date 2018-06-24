@@ -32,9 +32,9 @@ def draw_ani_ele(ele):
 
     return img
 
-def main(*args):
+def main(args):
     try:
-        x = dumpers.parse_file(dumpers.ani.desc, sys.argv[1])
+        x = dumpers.parse_file(dumpers.ani.desc, args[2])
     except:
         x = dumpers.parse_file(dumpers.ani.desc, dumpers.ani.FILENAME)
 

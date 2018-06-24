@@ -1,34 +1,12 @@
+from tr import dumpers
+import pti
+
 import sys
 import os
 
 # F000:14CB                   ] break CODS_PLAYER.EXE:seg005:1a2
 # CODS_PLAYER.EXE:seg008:1337 ] iv ds:22fe current_tok
 # CODS_PLAYER.EXE:seg005:01A2 ] iv ds:2300 off
- 
-try:
-    filename = sys.argv[1]
-except:
-    filename = '../original/GAME_DIR/PLR/PLA/AN00.PLA'
-
-TEXTS_IT    = "../original/GAME_DIR/PTX/Texts.kit"
-
-def pti_file_to_dict(content):
-    lines = {}
-    for block in content['pti_blocks']:
-        for line in block['lines']:
-            n, l = line['line_id'], line['line']
-            lines[n] = l
-
-    return lines
-
-def load_text_file(filename):
-    texts_it = parse_file(pti_desc, filename)
-    return pti_file_to_dict(texts_it)
-
-try:
-    texts = load_text_file(TEXTS_IT)
-except:
-    pass
 
 def next_int16(i):
     first_i,  first_b  = next(i)
@@ -288,11 +266,11 @@ def disassa():
         print ', '.join(repr(j) for _, j in args)
 
 
-def disassapy():
-    intro_pla = [ord(i) for i in open(filename).read()]
-    i = enumerate(iter(intro_pla))
+def disassapy(filename):
+    pla_file = [ord(i) for i in open(filename).read()]
+    i = enumerate(iter(pla_file))
 
-    print 'import pla'
+    print 'from tr.formats import pla'
     print
     print 'a = pla.Asm()'
     print
@@ -325,7 +303,13 @@ def disassapy():
     print
     print 'a.run()'
 
-if __name__ == '__main__':
-    disassapy()
+def main(args):
+    try:    filename = args[2]
+    except: filename = '../original/GAME_DIR/PLR/PLA/AN00.PLA'
+
+    texts = dumpers.parse_file(dumpers.pti.desc, dumpers.pti.FILENAME)
+    lines = pti.pti_file_to_dict(texts)
+
+    disassapy(filename)
 
 
