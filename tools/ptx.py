@@ -1,4 +1,5 @@
 from dumper import *
+import sys
 
 FILENAME = "../original/GAME_DIR/AR1/FIL/PTX"
 
@@ -26,6 +27,9 @@ ptx_desc = (
 )
 
 if __name__ == '__main__':
-    dump_file(ptx_desc, FILENAME)
+    try:
+        dump_file(ptx_desc, sys.argv[1])
+    except:
+        dump_file(ptx_desc, FILENAME)
 
 

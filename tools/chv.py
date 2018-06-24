@@ -1,7 +1,7 @@
 from dumper import *
 from ele import ele_desc, draw_ele
 
-FILENAME = "../original/GAME_DIR/FNT/MANAGER.CHV"
+FILENAME = "../original/GAME_DIR/FNT/INTRO.CHV"
 
 chv_desc = (
     (uint8, 'first_char'),

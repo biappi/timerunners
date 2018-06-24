@@ -1,4 +1,5 @@
 from dumper import *
+import sys
 
 FILENAME = "../original/GAME_DIR/PTX/Texts.kit"
 
@@ -38,4 +39,7 @@ pti_desc = (
 )
 
 if __name__ == '__main__':
-    dump_file(pti_desc, FILENAME)
+    try:
+        dump_file(pti_desc, sys.argv[1])
+    except:
+        dump_file(pti_desc, FILENAME)

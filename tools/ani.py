@@ -1,9 +1,9 @@
 from dumper import *
-from ele import ele_desc, show_ele, draw_ele
-from pal import load_palette
+from ele import ele_desc
 from imageutils import Image
+import sys
 
-FILENAME = "../original/GAME_DIR/PLR/BNK/ANIS09.ANI"
+FILENAME = "../original/GAME_DIR/PLR/BNK/ANIX05.ANI"
 
 ani_desc = (
     (uint16,   'unused1'),
@@ -18,11 +18,13 @@ ani_desc = (
         'items_struct': {
             (uint32, 'boh'),
         },
-        'items': relative('count'),
+        'items': add(relative('count'), fixed(-1)),
     }),
 
+    (uint32, '00 ff 00 00'),
+    (uint8, '08'),
     (block, 'palette', {
-        'offset': add(relative('.palette_offset'), fixed(18)),
+        'offset': add(relative('.palette_offset'), fixed(15)),
         'items_struct': (
             (array,  'colors', {
                 'items_struct': {
@@ -30,7 +32,7 @@ ani_desc = (
                     (uint8, 'g'),
                     (uint8, 'r'),
                 },
-                'items': fixed(255),
+                'items': fixed(256),
             }),
         ),
         'count': fixed(1)
@@ -44,35 +46,43 @@ ani_desc = (
 )
 
 
-if 1:
-    ani_file = parse_file(ani_desc, FILENAME)
+def color_dict_to_string(c):
+    return "#%02x%02x%02x" % (c['b'] << 2, c['g'] << 2, c['r'] << 2)
 
-    pal = ['#000000'] * 256
+def draw_ani_ele(ele):
+    def line_expand_ani(l):
+        q = iter(l[:-1])
+        r = []
+        while True:
+            try:
+                r += [0] * next(q)
+                count = next(q)
+                for _ in xrange(count):
+                    r.append(next(q))
+            except StopIteration:
+                return r
 
-    def color_dict_to_string(c):
-        return "#%02x%02x%02x" % (c['r'] << 2, c['g'] << 2, c['b'] << 2)
+    width, height = ele['width'], ele['count']
+    img = Image(width, height)
 
-    for i, color in  enumerate(ani_file['palette'][0]['colors']):
-        pal[i] = color_dict_to_string(color)
+    for y, l in enumerate(ele['lines']):
+        line = line_expand_ani(l['line'])
+        for x, c in enumerate(line):
+            try:
+                img.put(x, y, c)
+            except:
+                print "bad line", x, y, c
 
-    def draw_frame(i):
-        ele1 = ani_file['frames'][0]
-        width, height = ele1['width'] + 3, ele1['count']
-        img = Image(width, height)
+    return img
 
-        for y, l in enumerate(ele1['lines']):
-            line = l['line'][2:-1]
 
-            for x, c in enumerate(line):
-                try:
-                    img.put(x, y, c)
-                except:
-                    print "bad line", x, y, c
+try:
+    x = parse_file(ani_desc, sys.argv[1])
+except:
+    x = parse_file(ani_desc, FILENAME)
 
-        img.show(pal, 2)
-   
-    for i in xrange(ani_file['count']):
-        draw_frame(i)
+pal = map(color_dict_to_string, x['palette'][0]['colors'])
 
-else:
-    dump_file(ani_desc, FILENAME)
+for ele in x['frames']:
+    img = draw_ani_ele(ele)
+    img.show(pal, 2)

@@ -214,6 +214,13 @@ def uint32(loc, buf, pos, **kwargs):
     v += buf[pos + 3] <<  24
     return v, 4, int_f(loc, pos, v)
 
+def uint32_be(loc, buf, pos, **kwargs):
+    v  = buf[pos + 0] << 24
+    v += buf[pos + 1] << 16
+    v += buf[pos + 2] <<  8
+    v += buf[pos + 3]
+    return v, 4, int_f(loc, pos, v)
+
 def array(loc, buf, pos, items=None, items_struct=None, run_until=None, context={}, items_including=None):
     size = 0
     result = []
@@ -298,11 +305,29 @@ def stop_if(loc, buf, pos, context={}, is_zero=None):
     else:
         return None, None, None
 
-def string(loc, buf, pos, length, xor=fixed(0), context={}, binary=fixed(False), **kwargs):
+def string(
+    loc,
+    buf,
+    pos,
+    length,
+    xor=fixed(0),
+    pascal=fixed(False),
+    context={},
+    binary=fixed(False),
+    **kwargs
+):
     length = length.get_in(context, loc)
     xor = xor.get_in(context, loc)
-    v = ''.join(chr(i ^ xor) for i in buf[pos:pos + length])
-    desc = 'binary string (length: %x)' % length if binary.get_in(context, loc) else v
+    desc = ''.join(chr(i ^ xor) for i in buf[pos:pos + length])
+    v = desc
+
+    if binary.get_in(context, loc):
+        desc = 'binary string (length: %x)' % length
+
+    if pascal.get_in(context, loc):
+        strlen = ord(v[0])
+        desc = v[1 : 1 + strlen]
+
     desc = "%s %s" % (loc_f(loc, pos), desc)
     return v, length, desc
 
