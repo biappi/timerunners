@@ -1,9 +1,8 @@
 from dumper import *
-import sys
 
 FILENAME = "../original/SAVEGAME/SAV0MNG1.SIM"
 
-sav_mng_desc = (
+desc = (
     (padding, 'thumbnail', { 'size':   fixed(0x1c06) }),
     (string,  'name',      { 'length': fixed(0x15), 'pascal': fixed(True) }),
     (padding, 'palette',   { 'size':   fixed(0x300)  }),
@@ -27,10 +26,4 @@ sav_mng_desc = (
         'items': fixed(0x40),
     })
 )
-
-try:
-    dump_file(sav_mng_desc, sys.argv[1])
-except:
-    dump_file(sav_mng_desc, FILENAME)
-
 

@@ -1,35 +1,9 @@
-from dumper import *
+from tr import dumpers
+
 from pal import load_palette
+from ..utils import imageutils
+
 import sys
-
-ele_desc = (
-    (uint16, 'width'),
-    (uint16, 'count'),
-    (uint8,  'must_be_2'),
-    (array,  'lines', {
-        'items_struct': (
-            (run_until, 'line', {'end_byte': fixed(0xff)}),
-        ),
-        'items': relative('count'),
-    }),
-    (uint16, 'stop_mark'),
-)
-
-ele_file = (
-    (uint16, 'image_count'),
-    (array,  'relocations', {
-        'items_struct': (
-            (uint16, 'off'),
-            (uint16, 'seg'),
-        ),
-        'items': relative('image_count'),
-    }),
-    (block, 'eles', {
-        'offset': add(relative('.relocations.{i}.off'), fixed(2)),
-        'items_struct': ele_desc,
-        'count': relative('image_count'),
-    }),
-)
 
 def draw_ele(ele, col=1, p=None):
     class printer(object):
@@ -88,8 +62,6 @@ def draw_ele(ele, col=1, p=None):
                 return
 
 def show_ele(ele, palette, col=1, mult=1, filename=None):
-    import imageutils
-
     class imager(object):
         def __init__(self):
             self.width = ele['width']
@@ -122,12 +94,12 @@ def show_ele(ele, palette, col=1, mult=1, filename=None):
     else:
         i.image.save_image(palette, mult, filename)
 
-if __name__ == '__main__':
+def main(*args):
     FILENAME = '../original/GAME_DIR/AR1/IMG/K.ELE'
     FILENAME = '../original/GAME_DIR/AR1/UCC/UCCI0.ELE'
     FILENAME = '../original/GAME_DIR/AR1/IMG/TR.ELE'
 
-    x = parse_file(ele_file, FILENAME)
+    x = dumpers.parse_file(dumpers.ele.desc, FILENAME)
 
     pal_file = "../original/GAME_DIR/AR1/STA/ARCADE.PAL"
     palette = load_palette(pal_file)

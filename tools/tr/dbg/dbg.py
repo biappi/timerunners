@@ -2,8 +2,6 @@ import socket
 import cmd
 import pprint
 import sys
-import imageutils
-import dumper
 import select
 
 import readline
@@ -400,6 +398,7 @@ class Debugger(cmd.Cmd):
     def do_bplist  (self, line): self.default('bplist')
 
     def do_vgascreen(self, line):
+        import imageutils
         bitmap  = self.get_data('a000:0000', 0xfa00)
 
         palette = self.command('dumppal')

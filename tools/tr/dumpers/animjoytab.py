@@ -2,7 +2,7 @@ from dumper import *
 
 FILENAME = "../original/GAME_DIR/AR1/FIL/ANIMJOY.TAB"
 
-tab_desc = (
+desc = (
     (array, 'offsets', {
         'items_struct': (
             (array, 'offsets', {
@@ -15,7 +15,4 @@ tab_desc = (
         'items': fixed(106),
     }),
 )
-
-dump_file(tab_desc, FILENAME)
-
 

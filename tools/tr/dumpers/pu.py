@@ -1,6 +1,7 @@
 from dumper import *
 
 FILENAME = "../original/GAME_DIR/AR1/FIL/PU"
+
 pu_item = (
 
     (uint16_be, 'x1'),
@@ -31,7 +32,7 @@ pu_item = (
     (uint16_be, 'unk27'),
 )
 
-pu_desc = (
+desc = (
     (array, 'rooms', {
         'items_struct': (
             (array, 'pu', {
@@ -42,10 +43,5 @@ pu_desc = (
         'items': fixed(140/2),
    }),
 )
-
-if __name__ == '__main__':
-    dump_file(pu_item, FILENAME)
-    dump_file(pu_desc, FILENAME)
-
 
 

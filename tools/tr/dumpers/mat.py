@@ -5,7 +5,7 @@ FILENAME = "../original/GAME_DIR/AR1/STA/BUFFER1.MAT"
 TILE_W = 16
 TILE_H = 10
 
-mat_desc = (
+desc = (
     (array, 'tiles', {
         'items': fixed((320 * 200) / (16 * 10)),
         'items_struct': (
@@ -23,6 +23,3 @@ mat_desc = (
         ),
     }),
 )
-
-if __name__ == '__main__':
-    dump_file(mat_desc, FILENAME)

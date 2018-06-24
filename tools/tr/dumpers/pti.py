@@ -1,9 +1,8 @@
 from dumper import *
-import sys
 
 FILENAME = "../original/GAME_DIR/PTX/Texts.kit"
 
-pti_desc = (
+desc = (
     (string,  'header_simul', {'length': fixed(0x40)}),
     (array,   'infos', {
         'items_struct': (
@@ -37,9 +36,3 @@ pti_desc = (
         'ignore_if_zero': relative('.infos.{i}.first_line_in_this'),
     })
 )
-
-if __name__ == '__main__':
-    try:
-        dump_file(pti_desc, sys.argv[1])
-    except:
-        dump_file(pti_desc, FILENAME)

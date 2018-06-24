@@ -48,12 +48,13 @@ class Wavino(object):
 
         return bytearray(riff_chunk + fmt_chunk + data_chunk)
 
-for fid in ['01', '02', '03', '04', '05', '06', '07', '08', '09', '0A']:
-    with open(FILENAME(fid), 'rb') as f:
-        data = [ord(i) for i in f.read()]
-        # plt.plot([x if x < 128 else x-255 for x in data])
-        # plt.show()
+def main(*args):
+    for fid in ['01', '02', '03', '04', '05', '06', '07', '08', '09', '0A']:
+        with open(FILENAME(fid), 'rb') as f:
+            data = [ord(i) for i in f.read()]
+            # plt.plot([x if x < 128 else x-255 for x in data])
+            # plt.show()
 
-        with open(FILENAME(fid) + '.wav', 'wb') as w:
-            w.write(Wavino(
-                [128 + (x if x < 128 else x - 255) for x in data]).raw())
+            with open(FILENAME(fid) + '.wav', 'wb') as w:
+                w.write(Wavino(
+                    [128 + (x if x < 128 else x - 255) for x in data]).raw())

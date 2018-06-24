@@ -1,9 +1,8 @@
 from dumper import *
-import sys
 
 FILENAME = "../original/GAME_DIR/AR1/FIL/PTX"
 
-ptx_desc = (
+desc = (
     (string, 'unknown', {'binary': fixed(True), 'length':fixed(0x10)}),
         (uint16_be, 'count'),
         (array,    'items', {
@@ -25,11 +24,3 @@ ptx_desc = (
                 }),
     )}),
 )
-
-if __name__ == '__main__':
-    try:
-        dump_file(ptx_desc, sys.argv[1])
-    except:
-        dump_file(ptx_desc, FILENAME)
-
-

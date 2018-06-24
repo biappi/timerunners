@@ -2,7 +2,7 @@ from dumper import *
 
 FILENAME = "../original/GAME_DIR/AR1/FIL/PN"
 
-pn_desc = (
+desc = (
     (array, 'stars', {
         'items_struct': (
             (uint16_be, 'room_nr'),
@@ -14,7 +14,4 @@ pn_desc = (
     }),
     (uint16_be, 'stop_marker'),
 )
-
-dump_file(pn_desc, FILENAME)
-
 

@@ -1,5 +1,4 @@
 from dumper import *
-from ele import ele_desc, draw_ele
 
 FILENAME = "../original/GAME_DIR/AR1/MAP/ROOM.ROE"
 
@@ -9,7 +8,7 @@ ROOM_H = 0x14
 real_size_of_rooms   = 0x4f4
 real_number_of_rooms = 44
 
-room_desc = (
+desc = (
     (array, 'rooms', {
 
         'items_struct': (
@@ -52,7 +51,3 @@ room_desc = (
         'items': fixed(44),
     }),
 )
-
-if __name__ == '__main__':
-    dump_file(room_desc, FILENAME)
-

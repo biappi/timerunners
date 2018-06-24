@@ -1,9 +1,9 @@
 from dumper import *
 
-FILENAME_USC = "../original/GAME_DIR/AR1/FIL/USC"
-FILENAME_PRT = "../original/GAME_DIR/AR1/FIL/PRT"
+FILENAME = "../original/GAME_DIR/AR1/FIL/USC"
+FILENAME = "../original/GAME_DIR/AR1/FIL/PRT"
 
-usc_desc = (
+desc = (
     (array, 'exits', {
         'items_struct': (
             (uint8,     'room_to'),
@@ -17,7 +17,4 @@ usc_desc = (
     }),
     (uint16_be, 'stop_marker'),
 )
-
-dump_file(usc_desc, FILENAME_PRT)
-
 

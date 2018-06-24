@@ -2,7 +2,7 @@ from dumper import *
 
 FILENAME = "../original/GAME_DIR/AR1/FIL/LOGITAB.TAB"
 
-tab_desc = (
+desc = (
     (array, 'offsets', {
         'items_struct': ( (uint16_be, 'off'), ),
         'items': fixed(0x4d),
@@ -16,7 +16,4 @@ tab_desc = (
         'count': fixed(0x4d),
     }),
 )
-
-dump_file(tab_desc, FILENAME)
-
 

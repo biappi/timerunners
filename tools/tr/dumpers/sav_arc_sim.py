@@ -1,5 +1,4 @@
 from dumper import *
-import sys
 
 FILENAME = "../original/SAVEGAME/SAV0ARC1.SIM"
 
@@ -36,10 +35,4 @@ sav_arc_desc = (
     (uint16,  'to_set_pupo_x'),
     (uint16,  'to_set_pupo_y'),
 )
-
-try:
-    dump_file(sav_arc_desc, sys.argv[1])
-except:
-    dump_file(sav_arc_desc, FILENAME)
-
 
